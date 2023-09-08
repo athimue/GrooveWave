@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Groove Wave</string>
+    <string name="popular_tracks">Popular tracks</string>
+    <string name="popular_albums">Popular tracks</string>
+    <string name="popular_artists">Popular artists</string>
+    <string name="no_popular_tracks">No popular tracks</string>
+    <string name="no_popular_albums">No popular tracks</string>
+    <string name="no_popular_artists">No popular artists</string>
+    <string name="search">Search</string>
+</resources>
