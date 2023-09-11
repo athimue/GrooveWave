@@ -1,23 +1,25 @@
 package com.athimue.app.composable.search
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -26,14 +28,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.athimue.app.R
 import com.athimue.app.R.string
 import com.athimue.app.composable.home.PopularTitle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
-    val uiState = viewModel.searchUiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val filters = listOf("Track", "Album", "Artist", "Playlist", "Podcast", "Radio")
     var query by remember { mutableStateOf(TextFieldValue("")) }
+    var isBottomSheetDisplayed by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(isBottomSheetDisplayed)
+    var playlistSelected by remember { mutableStateOf(-1) }
+    var trackSelected by remember { mutableStateOf(-1L) }
     var filterSelected by remember { mutableStateOf("Track") }
 
     Column(
@@ -56,22 +64,110 @@ fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
                 fontSize = MaterialTheme.typography.titleSmall.fontSize
             )
         } else {
-            if (uiState.value.isLoading) {
+            if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
                         modifier = Modifier, color = MaterialTheme.colorScheme.primary
                     )
                 }
-            } else SearchGrid(uiState.value.searchResult)
+            } else SearchGrid(
+                searchResults = uiState.searchResult,
+                isPlaylistBtnDisplayed = filterSelected == "Track",
+                onPlaylistBtnClick = {
+                    trackSelected = it
+                    isBottomSheetDisplayed = true
+                },
+                onFavBtnClick = {},
+            )
+        }
+        if (isBottomSheetDisplayed) {
+            ModalBottomSheet(
+                onDismissRequest = { isBottomSheetDisplayed = false },
+                sheetState = bottomSheetState
+            ) {
+                Scaffold(
+                    floatingActionButtonPosition = FabPosition.Center,
+                    floatingActionButton = {
+                        Button(onClick = {
+                            viewModel.addTrackToPlaylist(playlistSelected, trackSelected)
+                            isBottomSheetDisplayed = false
+                        }) {
+                            Text(text = "Done")
+                        }
+                    }
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 10.dp, vertical = 20.dp
+                                )
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .clickable {
+                                        isBottomSheetDisplayed = false
+                                    },
+                                color = MaterialTheme.colorScheme.primary,
+                                text = "Cancel"
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                text = "Add to playlist",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                        Divider()
+                        LazyColumn {
+                            items(items = uiState.playlists) {
+                                Row {
+                                    Image(
+                                        painter = if (it.tracks.isNotEmpty()) rememberAsyncImagePainter(
+                                            it.tracks[0].cover
+                                        )
+                                        else {
+                                            painterResource(id = R.drawable.playlist_cover)
+                                        },
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .size(75.dp)
+                                            .padding(top = 4.dp, bottom = 4.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .padding(bottom = 3.dp)
+                                    )
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .padding(start = 10.dp)
+                                            .weight(1f)
+                                            .align(Alignment.CenterVertically),
+                                    ) {
+                                        Text(text = it.name)
+                                        Text(text = "${it.tracks.size} songs")
+                                    }
+                                    RadioButton(
+                                        modifier = Modifier.align(Alignment.CenterVertically),
+                                        selected = (it.id == playlistSelected),
+                                        onClick = { playlistSelected = it.id }
+                                    )
+                                }
+                                Divider()
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchBar(query: TextFieldValue, onQueryChange: (TextFieldValue) -> Unit) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     Column {
         PopularTitle(title = stringResource(id = string.search))
         Surface(
@@ -82,15 +178,21 @@ fun SearchBar(query: TextFieldValue, onQueryChange: (TextFieldValue) -> Unit) {
             shadowElevation = 5.dp,
             shape = RoundedCornerShape(10.dp)
         ) {
-            TextField(modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth(), textStyle = TextStyle(
-                fontWeight = FontWeight.Bold
-            ), value = query, maxLines = 1, singleLine = true, onValueChange = {
-                if (!it.text.contains("\n")) {
-                    onQueryChange(it)
-                }
-            }, keyboardActions = KeyboardActions(onSearch = { keyboardController?.hide() })
+            TextField(
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                textStyle = TextStyle(
+                    fontWeight = FontWeight.Bold
+                ),
+                value = query,
+                maxLines = 1,
+                singleLine = true,
+                onValueChange = {
+                    if (!it.text.contains("\n")) {
+                        onQueryChange(it)
+                    }
+                },
             )
         }
     }
@@ -111,7 +213,8 @@ fun ColumnScope.SearchFilter(
                     leadingIcon = {
                         if (it == filterSelected) {
                             Icon(
-                                imageVector = Icons.Filled.Check, contentDescription = "Check"
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = "Check"
                             )
                         }
                     },
@@ -133,10 +236,13 @@ fun ColumnScope.SearchFilter(
 
 @Composable
 fun ColumnScope.SearchGrid(
-    result: List<SearchResultModel>
+    searchResults: List<SearchResultModel>,
+    isPlaylistBtnDisplayed: Boolean,
+    onPlaylistBtnClick: (Long) -> Unit,
+    onFavBtnClick: (Long) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(result) { item ->
+        items(searchResults) { item ->
             Row(
                 modifier = Modifier
                     .padding(vertical = 5.dp)
@@ -150,9 +256,42 @@ fun ColumnScope.SearchGrid(
                         .size(50.dp)
                         .clip(RoundedCornerShape(10.dp))
                 )
-                Column(modifier = Modifier.padding(start = 10.dp)) {
-                    Text(text = item.title)
-                    Text(text = item.subTitle)
+                Column(
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .fillMaxHeight()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.SpaceAround
+                ) {
+                    Text(
+                        text = item.title,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = item.subTitle,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+                Button(
+                    modifier = Modifier.padding(5.dp),
+                    onClick = { onFavBtnClick(item.id) }) {
+                    Image(
+                        imageVector = Icons.Rounded.Favorite,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondaryContainer),
+                        contentDescription = ""
+                    )
+                }
+                if (isPlaylistBtnDisplayed) {
+                    Button(
+                        modifier = Modifier.padding(5.dp),
+                        onClick = { onPlaylistBtnClick(item.id) }
+                    ) {
+                        Image(
+                            imageVector = Icons.Rounded.Menu,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondaryContainer),
+                            contentDescription = ""
+                        )
+                    }
                 }
             }
             Divider()

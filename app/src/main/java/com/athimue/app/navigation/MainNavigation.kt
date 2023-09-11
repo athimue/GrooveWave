@@ -59,7 +59,14 @@ fun MainNavigation() {
             }
             composable(Screen.Library.route) {
                 LibraryComposable(
-                    onPlaylistClick = { navController.navigate(Screen.Playlist.route) },
+                    onPlaylistClick = {
+                        navController.navigate(
+                            Screen.Playlist.route.replace(
+                                oldValue = "{playlistId}",
+                                newValue = it.toString()
+                            )
+                        )
+                    },
                     onEditPlaylist = {})
             }
             composable(Screen.Favorites.route) {
@@ -72,7 +79,10 @@ fun MainNavigation() {
                     defaultValue = -1
                 })
             ) { playlistId ->
-                PlaylistComposable(playlistId.arguments?.getInt("playlistId") ?: -1)
+                PlaylistComposable(
+                    playlistId = playlistId.arguments?.getInt("playlistId") ?: -1,
+                    onBack = { navController.navigate(Screen.Library.route) }
+                )
             }
             composable(Screen.Track.route) {
                 TrackComposable()

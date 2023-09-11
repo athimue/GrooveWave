@@ -19,3 +19,10 @@ fun ArtistEntity.toArtist() = Artist(
     cover = cover,
     link = link
 )
+
+fun Artist.toArtistEntity() = ArtistEntity(
+    id = id,
+    name = name,
+    cover = cover,
+    link = link,
+)

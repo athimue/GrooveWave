@@ -11,5 +11,5 @@ class GetTrackSearchUseCaseImpl @Inject constructor(
     private val searchRepository: SearchRepository
 ) : GetTrackSearchUseCase {
     override suspend fun invoke(input: String): Flow<Resource<List<Track>>> =
-        searchRepository.getTrackSearch(input)
+        searchRepository.getTracks(input)
 }

@@ -1,9 +1,217 @@
 package com.athimue.app.composable.playlist
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import com.athimue.app.R
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun PlaylistComposable(
-    playlistId: Int
+    viewModel: PlaylistViewModel = hiltViewModel(),
+    playlistId: Int,
+    onBack: () -> Unit,
 ) {
+    viewModel.loadPlaylist(playlistId)
+    val uiState = viewModel.uiState.collectAsState()
+    Column {
+        uiState.value.playlist?.let {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 10.dp
+                    )
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.Rounded.ArrowBack,
+                        contentDescription = "Go back",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Image(
+                    painter = if (it.tracks.isNotEmpty()) rememberAsyncImagePainter(
+                        it.tracks[0].cover
+                    )
+                    else {
+                        painterResource(id = R.drawable.playlist_cover)
+                    },
+                    contentDescription = "",
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .padding(top = 4.dp, bottom = 4.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(bottom = 3.dp)
+                        .align(CenterHorizontally)
+                )
+                Text(
+                    text = it.name,
+                    modifier = Modifier.padding(start = 10.dp, top = 10.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize
+                )
+                Text(
+                    text = if (it.tracks.isNotEmpty()) {
+                        "${
+                            it.tracks.map { it.duration }.reduce { acc, dur -> acc + dur }
+                        } sec"
+                    } else "0 sec",
+                    modifier = Modifier.padding(start = 10.dp, top = 5.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize
+                )
+                Divider(modifier = Modifier.padding(start = 10.dp, top = 5.dp))
+                if (it.tracks.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier.padding(start = 10.dp, top = 5.dp)
+                    ) {
+                        items(items = it.tracks,
+                            key = { item -> item.id }) {
+                            val currentItem by rememberUpdatedState(it)
+                            val dismissState = rememberDismissState(
+                                confirmValueChange = { dismissValue ->
+                                    when (dismissValue) {
+                                        DismissValue.DismissedToStart -> {
+                                            viewModel.deletePlaylistTrack(
+                                                trackId = currentItem.id,
+                                                playlistId = playlistId
+                                            )
+                                            true
+                                        }
+                                        else -> false
+                                    }
+                                }
+                            )
+                            SwipeToDismiss(
+                                state = dismissState,
+                                modifier = Modifier
+                                    .padding(vertical = 1.dp)
+                                    .animateItemPlacement(),
+                                background = {
+                                    SwipeBackground(dismissState)
+                                },
+                                directions = setOf(DismissDirection.EndToStart),
+                                dismissContent = {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(vertical = 5.dp)
+                                            .padding(horizontal = 5.dp)
+                                    ) {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(it.cover),
+                                            contentDescription = "",
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .size(50.dp)
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .align(CenterVertically)
+                                        )
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(start = 10.dp)
+                                                .weight(1f)
+                                        ) {
+                                            Text(
+                                                text = it.title,
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                            Text(
+                                                text = it.album.name,
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                            Text(
+                                                text = it.artist.name,
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
+                                        Button(
+                                            onClick = { /*TODO*/ },
+                                            modifier = Modifier.align(CenterVertically),
+                                        ) {
+                                            Image(
+                                                imageVector = Icons.Rounded.PlayArrow,
+                                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
+                                                contentDescription = "",
+                                            )
+                                        }
+                                    }
+                                    Divider()
+                                }
+                            )
+                        }
+                    }
+                } else
+                    Text(
+                        text = "No tracks inside this playlist.",
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 10.dp, top = 5.dp)
+                    )
+            }
+        }
+            ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(
+                    modifier = Modifier, color = MaterialTheme.colorScheme.primary
+                )
+            }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SwipeBackground(dismissState: DismissState) {
+    val color by animateColorAsState(
+        when (dismissState.targetValue) {
+            DismissValue.Default -> Color.White
+            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
+            DismissValue.DismissedToStart -> MaterialTheme.colorScheme.secondary
+        }
+    )
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Delete,
+            contentDescription = "Delete Icon",
+            modifier = Modifier.scale(if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f)
+        )
+    }
 }

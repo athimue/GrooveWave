@@ -34,4 +34,7 @@ abstract class SingletonModule {
 
     @Binds
     abstract fun provideGetPlaylistsUseCase(getPlaylistUseCase: GetPlaylistUseCaseImpl): GetPlaylistUseCase
+
+    @Binds
+    abstract fun provideGetTrackUseCase(getTrackInfoUseCase: GetTrackInfoUseCaseImpl): GetTrackInfoUseCase
 }

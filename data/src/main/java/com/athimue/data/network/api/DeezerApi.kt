@@ -2,9 +2,11 @@ package com.athimue.data.network.api
 
 import com.athimue.data.network.dto.album.AlbumListDto
 import com.athimue.data.network.dto.artist.ArtistListDto
+import com.athimue.data.network.dto.track.TrackDetailDto
 import com.athimue.data.network.dto.track.TrackListDto
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface DeezerApi {
@@ -17,6 +19,9 @@ interface DeezerApi {
 
     @GET("chart/0/artists")
     suspend fun getChartArtists(): Response<ArtistListDto>
+
+    @GET("track/{trackID}")
+    suspend fun getTrack(@Path("trackID") trackId: Long): Response<TrackDetailDto>
 
     @GET("search/track")
     suspend fun getSearchedTracks(@Query("q") query: String): Response<TrackListDto>

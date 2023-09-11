@@ -20,10 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
 import com.athimue.app.R
 import com.athimue.app.composable.home.PopularTitle
 import com.athimue.domain.model.Playlist
@@ -56,46 +54,40 @@ fun LibraryComposable(
             modifier = Modifier.fillMaxWidth()
         ) {
             PopularTitle(title = "Your library")
-            uiState.playlist?.let {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(
-                        items = it,
-                        key = { item -> item.id }) {
-                        val currentItem by rememberUpdatedState(it)
-                        val dismissState = rememberDismissState(
-                            confirmValueChange = { dismissValue ->
-                                when (dismissValue) {
-                                    DismissValue.DismissedToEnd -> {
-                                        onEditPlaylist(currentItem.id)
-                                        true
-                                    }
-                                    DismissValue.DismissedToStart -> {
-                                        viewModel.deletePlaylist(currentItem.id)
-                                        true
-                                    }
-                                    else -> false
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(
+                    items = uiState.playlists,
+                    key = { item -> item.id }) {
+                    val currentItem by rememberUpdatedState(it)
+                    val dismissState = rememberDismissState(
+                        confirmValueChange = { dismissValue ->
+                            when (dismissValue) {
+                                DismissValue.DismissedToEnd -> {
+                                    onEditPlaylist(currentItem.id)
+                                    true
                                 }
+                                DismissValue.DismissedToStart -> {
+                                    viewModel.deletePlaylist(currentItem.id)
+                                    true
+                                }
+                                else -> false
                             }
-                        )
-                        SwipeToDismiss(
-                            state = dismissState,
-                            modifier = Modifier
-                                .padding(vertical = 1.dp)
-                                .animateItemPlacement(),
-                            background = {
-                                SwipeBackground(dismissState)
-                            },
-                            dismissContent = {
-                                PlaylistItemRow(it, onPlaylistClick)
-                            }
-                        )
-                    }
+                        }
+                    )
+                    SwipeToDismiss(
+                        state = dismissState,
+                        modifier = Modifier
+                            .padding(vertical = 1.dp)
+                            .animateItemPlacement(),
+                        background = {
+                            SwipeBackground(dismissState)
+                        },
+                        dismissContent = {
+                            PlaylistItemRow(it, onPlaylistClick)
+                        }
+                    )
                 }
-            } ?: Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "No playlist",
-                textAlign = TextAlign.Center
-            )
+            }
             if (isBottomSheetDisplayed) {
                 ModalBottomSheet(
                     onDismissRequest = { isBottomSheetDisplayed = false },
@@ -253,24 +245,21 @@ private fun SwipeBackground(dismissState: DismissState) {
 }
 
 @Composable
-private fun PlaylistItemRow(it: Playlist, onPlaylistClick: (Int) -> Unit) {
+private fun PlaylistItemRow(playlist: Playlist, onPlaylistClick: (Int) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer
             )
-            .clickable { onPlaylistClick(it.id) }
+            .clickable { onPlaylistClick(playlist.id) }
             .padding(vertical = 5.dp)
             .padding(horizontal = 5.dp)
     ) {
         Image(
-            painter = if (it.tracks.isNotEmpty()) rememberAsyncImagePainter(
-                it.tracks[0].cover
-            )
-            else {
-                painterResource(id = R.drawable.playlist_cover)
-            },
+            painter = painterResource(
+                id = R.drawable.playlist_cover
+            ),
             contentDescription = "",
             modifier = Modifier
                 .size(50.dp)
@@ -279,9 +268,8 @@ private fun PlaylistItemRow(it: Playlist, onPlaylistClick: (Int) -> Unit) {
                 .padding(bottom = 3.dp)
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            Text(text = it.name)
-            Text(text = it.id.toString())
-            Text(text = "Tracks nb : " + it.tracks.size.toString())
+            Text(text = playlist.name, color = MaterialTheme.colorScheme.primary)
+            Text(text = "${playlist.tracks.size} songs", color = MaterialTheme.colorScheme.primary)
         }
     }
 }

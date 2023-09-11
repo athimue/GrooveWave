@@ -14,5 +14,11 @@ data class PlaylistEntity(
 fun PlaylistEntity.toPlaylist() = Playlist(
     id = id,
     name = name,
-    tracks = tracks.map(TrackEntity::toTrack)
+    tracks = tracks.map { it.id }
+)
+
+fun Playlist.toPlaylistEntity() = PlaylistEntity(
+    id = id,
+    name = name,
+    tracks = tracks.map { TrackEntity(it) }
 )

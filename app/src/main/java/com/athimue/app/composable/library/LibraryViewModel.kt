@@ -20,7 +20,7 @@ class LibraryViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getPlaylistUseCase.invoke().collect {
-                uiState.value = uiState.value.copy(playlist = it)
+                uiState.value = uiState.value.copy(playlists = it)
             }
         }
     }

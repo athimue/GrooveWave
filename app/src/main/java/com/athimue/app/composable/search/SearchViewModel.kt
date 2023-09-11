@@ -1,13 +1,14 @@
 package com.athimue.app.composable.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.athimue.app.composable.playlist.PlaylistUiModel
 import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
-import com.athimue.domain.usecase.GetAlbumSearchUseCase
-import com.athimue.domain.usecase.GetArtistSearchUseCase
-import com.athimue.domain.usecase.GetTrackSearchUseCase
+import com.athimue.domain.repository.PlaylistRepository
+import com.athimue.domain.usecase.*
 import com.athimue.domain.usecase.definition.SuspendWithInputUseCase
 import com.athimue.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,15 +24,33 @@ class SearchViewModel @Inject constructor(
     private val getTrackSearchUseCase: GetTrackSearchUseCase,
     private val getAlbumSearchUseCase: GetAlbumSearchUseCase,
     private val getArtistSearchUseCase: GetArtistSearchUseCase,
+    private val getTrackInfoUseCase: GetTrackInfoUseCase,
+    private val getPlaylistUseCase: GetPlaylistUseCase,
+    private val playlistRepository: PlaylistRepository
 ) : ViewModel() {
 
-    var searchUiState: MutableStateFlow<SearchUiState> =
-        MutableStateFlow(SearchUiState(false, listOf()))
+    var uiState: MutableStateFlow<SearchUiState> =
+        MutableStateFlow(SearchUiState())
 
     private var searchJob: Job? = null
 
+    init {
+        viewModelScope.launch {
+            getPlaylistUseCase.invoke().collect {
+                uiState.value = uiState.value.copy(playlists = it.map { playlist ->
+                    Log.d("COUCOU", playlist.toString())
+                    PlaylistUiModel(
+                        id = playlist.id,
+                        name = playlist.name,
+                        tracks = loadPlaylistTracks(playlist.tracks)
+                    )
+                })
+            }
+        }
+    }
+
     fun searchRequested(filter: String, query: String) {
-        searchUiState.value = searchUiState.value.copy(isLoading = true)
+        uiState.value = uiState.value.copy(isLoading = true)
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(500)
@@ -62,6 +81,29 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    fun addTrackToPlaylist(playlistId: Int, trackId: Long) {
+        viewModelScope.launch {
+            playlistRepository.addTrack(
+                playlistId = playlistId,
+                trackId = trackId
+            )
+        }
+    }
+
+    private suspend fun loadPlaylistTracks(ids: List<Long>): List<Track> {
+        val tracks = mutableListOf<Track>()
+        ids.forEach { trackId ->
+            getTrackInfoUseCase.invoke(trackId).collect {
+                when (it) {
+                    is Resource.Success ->
+                        tracks.add(it.data)
+                    else -> {}
+                }
+            }
+        }
+        return tracks
+    }
+
     private suspend fun <T> searchByQuery(
         getSearchUseCase: SuspendWithInputUseCase<String, Flow<Resource<List<T>>>>,
         mapper: (T) -> SearchResultModel,
@@ -70,31 +112,34 @@ class SearchViewModel @Inject constructor(
         getSearchUseCase.invoke(query).collect { result ->
             when (result) {
                 is Resource.Success -> {
-                    searchUiState.value = searchUiState.value.copy(
+                    uiState.value = uiState.value.copy(
                         isLoading = false,
                         searchResult = result.data.map { mapper(it) })
                 }
                 is Resource.Error -> {
-                    searchUiState.value =
-                        searchUiState.value.copy(isLoading = false, searchResult = emptyList())
+                    uiState.value =
+                        uiState.value.copy(isLoading = false, searchResult = emptyList())
                 }
             }
         }
     }
 
     private fun Track.toSearchResultModel(): SearchResultModel = SearchResultModel(
+        id = id,
         title = title,
         subTitle = artist.name,
         picture = cover,
     )
 
     private fun Album.toSearchResultModel(): SearchResultModel = SearchResultModel(
+        id = id,
         title = name,
         subTitle = id.toString(),
         picture = cover,
     )
 
     private fun Artist.toSearchResultModel(): SearchResultModel = SearchResultModel(
+        id = id,
         title = name,
         subTitle = link,
         picture = cover,

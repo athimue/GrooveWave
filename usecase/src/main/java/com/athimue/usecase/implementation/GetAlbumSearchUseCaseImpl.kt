@@ -12,6 +12,6 @@ class GetAlbumSearchUseCaseImpl @Inject constructor(
 ) : GetAlbumSearchUseCase {
 
     override suspend fun invoke(input: String): Flow<Resource<List<Album>>> =
-        searchRepository.getAlbumSearch(input)
+        searchRepository.getAlbums(input)
 
 }

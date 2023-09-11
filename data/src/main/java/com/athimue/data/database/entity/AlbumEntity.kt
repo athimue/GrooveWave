@@ -17,3 +17,9 @@ fun AlbumEntity.toAlbum() = Album(
     name = name,
     cover = cover
 )
+
+fun Album.toAlbumEntity() = AlbumEntity(
+    id = id,
+    name = name,
+    cover = cover,
+)

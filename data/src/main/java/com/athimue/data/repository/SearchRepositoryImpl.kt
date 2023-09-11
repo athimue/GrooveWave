@@ -1,5 +1,6 @@
 package com.athimue.data.repository
 
+import android.util.Log
 import com.athimue.data.network.api.DeezerApi
 import com.athimue.data.network.dto.album.AlbumDto
 import com.athimue.data.network.dto.album.toAlbum
@@ -20,7 +21,22 @@ class SearchRepositoryImpl @Inject constructor(
     private val deezerApi: DeezerApi
 ) : SearchRepository {
 
-    override suspend fun getTrackSearch(query: String): Flow<Resource<List<Track>>> {
+    override suspend fun getTrack(id: Long): Flow<Resource<Track>> {
+        return flow {
+            runCatching {
+                val response = deezerApi.getTrack(id)
+                response.takeIf { it.isSuccessful }?.body()?.let {
+                    Log.d("COUCOU success", it.toString())
+                    emit(Resource.Success(it.toTrack()))
+                } ?: emit(Resource.Error("No data"))
+            }.getOrElse {
+                Log.d("COUCOU else", it.toString())
+                emit(Resource.Error(it.toString()))
+            }
+        }
+    }
+
+    override suspend fun getTracks(query: String): Flow<Resource<List<Track>>> {
         return flow {
             runCatching {
                 val response = deezerApi.getSearchedTracks(query)
@@ -33,7 +49,7 @@ class SearchRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAlbumSearch(query: String): Flow<Resource<List<Album>>> {
+    override suspend fun getAlbums(query: String): Flow<Resource<List<Album>>> {
         return flow {
             runCatching {
                 val response = deezerApi.getSearchedAlbums(query)
@@ -46,7 +62,7 @@ class SearchRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getArtistSearch(query: String): Flow<Resource<List<Artist>>> {
+    override suspend fun getArtists(query: String): Flow<Resource<List<Artist>>> {
         return flow {
             runCatching {
                 val response = deezerApi.getSearchedArtists(query)
@@ -59,15 +75,15 @@ class SearchRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPlaylistSearch(query: String): Flow<Resource<List<Track>>> {
+    override suspend fun getPlaylists(query: String): Flow<Resource<List<Track>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getPodcastSearch(query: String): Flow<Resource<List<Track>>> {
+    override suspend fun getPodcasts(query: String): Flow<Resource<List<Track>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getRadioSearch(query: String): Flow<Resource<List<Track>>> {
+    override suspend fun getRadios(query: String): Flow<Resource<List<Track>>> {
         TODO("Not yet implemented")
     }
 

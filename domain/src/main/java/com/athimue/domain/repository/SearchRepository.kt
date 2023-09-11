@@ -8,15 +8,17 @@ import kotlinx.coroutines.flow.Flow
 
 interface SearchRepository {
 
-    suspend fun getTrackSearch(query: String): Flow<Resource<List<Track>>>
+    suspend fun getTrack(id: Long): Flow<Resource<Track>>
 
-    suspend fun getAlbumSearch(query: String): Flow<Resource<List<Album>>>
+    suspend fun getTracks(query: String): Flow<Resource<List<Track>>>
 
-    suspend fun getArtistSearch(query: String): Flow<Resource<List<Artist>>>
+    suspend fun getAlbums(query: String): Flow<Resource<List<Album>>>
 
-    suspend fun getPlaylistSearch(query: String): Flow<Resource<List<Track>>>
+    suspend fun getArtists(query: String): Flow<Resource<List<Artist>>>
 
-    suspend fun getPodcastSearch(query: String): Flow<Resource<List<Track>>>
+    suspend fun getPlaylists(query: String): Flow<Resource<List<Track>>>
 
-    suspend fun getRadioSearch(query: String): Flow<Resource<List<Track>>>
+    suspend fun getPodcasts(query: String): Flow<Resource<List<Track>>>
+
+    suspend fun getRadios(query: String): Flow<Resource<List<Track>>>
 }
