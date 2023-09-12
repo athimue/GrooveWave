@@ -37,7 +37,10 @@ import com.athimue.app.composable.common.TitleText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
+fun SearchComposable(
+    viewModel: SearchViewModel = hiltViewModel(),
+    onTrackClick: (Long) -> Unit
+) {
     val uiState by viewModel.uiState.collectAsState()
     val filters = listOf("Track", "Album", "Artist", "Playlist", "Podcast", "Radio")
     var query by remember { mutableStateOf(TextFieldValue("")) }
@@ -77,6 +80,7 @@ fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
                     isBottomSheetDisplayed = true
                 },
                 onFavBtnClick = { viewModel.addTrackToFavorite(it) },
+                onTrackClick = onTrackClick
             )
         }
         if (isBottomSheetDisplayed) {
@@ -244,6 +248,7 @@ fun ColumnScope.SearchGrid(
     isPlaylistBtnDisplayed: Boolean,
     onPlaylistBtnClick: (Long) -> Unit,
     onFavBtnClick: (Long) -> Unit,
+    onTrackClick: (Long) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(searchResults) { item ->
@@ -251,6 +256,7 @@ fun ColumnScope.SearchGrid(
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .padding(horizontal = 5.dp)
+                    .clickable { onTrackClick(item.id) }
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(item.picture),

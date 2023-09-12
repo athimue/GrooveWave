@@ -31,14 +31,21 @@ import com.athimue.app.composable.common.TitleText
 fun HomeComposable(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
+    onTrackClick: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    HomeComposableContent(uiState = uiState, modifier = modifier)
+    HomeComposableContent(
+        uiState = uiState,
+        modifier = modifier,
+        onTrackClick = onTrackClick
+    )
 }
 
 @Composable
 fun HomeComposableContent(
-    uiState: HomeUiState, modifier: Modifier = Modifier
+    uiState: HomeUiState,
+    modifier: Modifier = Modifier,
+    onTrackClick: (Long) -> Unit
 ) {
     val scrollState = rememberScrollState()
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -58,13 +65,13 @@ fun HomeComposableContent(
                 .fillMaxWidth()
         ) {
             uiState.tracks?.let {
-                HomeLazyRow(R.string.popular_tracks, R.string.no_popular_tracks, it)
+                HomeLazyRow(R.string.popular_tracks, R.string.no_popular_tracks, it, onTrackClick)
             }
             uiState.albums?.let {
-                HomeLazyRow(R.string.popular_albums, R.string.no_popular_albums, it)
+                HomeLazyRow(R.string.popular_albums, R.string.no_popular_albums, it, onTrackClick)
             }
             uiState.artists?.let {
-                HomeLazyRow(R.string.popular_artists, R.string.no_popular_artists, it)
+                HomeLazyRow(R.string.popular_artists, R.string.no_popular_artists, it, onTrackClick)
             }
         }
     }
@@ -72,7 +79,10 @@ fun HomeComposableContent(
 
 @Composable
 fun ColumnScope.HomeLazyRow(
-    titleId: Int, errorTitle: Int, items: List<LazyRowItemModel>
+    titleId: Int,
+    errorTitle: Int,
+    items: List<LazyRowItemModel>,
+    onTrackClick: (Long) -> Unit
 ) {
     TitleText(stringResource(id = titleId))
     if (items.isEmpty()) {
@@ -84,7 +94,10 @@ fun ColumnScope.HomeLazyRow(
                 .padding(10.dp),
         ) {
             items(items) { item ->
-                LazyRowItem(title = item.title, cover = item.picture)
+                LazyRowItem(
+                    item = item,
+                    onTrackClick = onTrackClick
+                )
             }
         }
     }
@@ -106,15 +119,15 @@ fun ErrorTitle(title: String) {
 
 @Composable
 fun LazyRowItem(
-    title: String,
-    cover: String,
+    item: LazyRowItemModel,
+    onTrackClick: (Long) -> Unit
 ) {
     Column(
-        modifier = Modifier.clickable { },
+        modifier = Modifier.clickable { onTrackClick(item.id) },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = rememberAsyncImagePainter(cover),
+            painter = rememberAsyncImagePainter(item.picture),
             contentDescription = "",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -126,7 +139,10 @@ fun LazyRowItem(
         Text(
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Light,
-            text = title.substring(0, if (title.lastIndex > 10) 10 else title.lastIndex),
+            text = item.title.substring(
+                0,
+                if (item.title.lastIndex > 10) 10 else item.title.lastIndex
+            ),
         )
     }
     Spacer(modifier = Modifier.size(10.dp))

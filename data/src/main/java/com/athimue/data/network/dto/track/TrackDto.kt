@@ -28,8 +28,13 @@ data class TrackDto(
 fun TrackDto.toTrack() = Track(
     id = id,
     title = title,
-    duration = duration,
+    titleShort = title_short,
     link = link,
+    duration = duration,
+    rank = rank,
+    explicitLyrics = explicitLyrics,
+    preview = preview,
+    position = position,
     cover = album.cover,
     artist = artist.toArtist(),
     album = album.toAlbum()

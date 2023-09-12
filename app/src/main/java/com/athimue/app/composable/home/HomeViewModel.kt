@@ -60,9 +60,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun Track.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(title, cover)
+    private fun Track.toLazyRowItemModel(): LazyRowItemModel =
+        LazyRowItemModel(id, titleShort, cover)
 
-    private fun Album.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(name, cover)
+    private fun Album.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(id, name, cover)
 
-    private fun Artist.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(name, cover)
+    private fun Artist.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(id, name, cover)
 }
