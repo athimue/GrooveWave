@@ -1,7 +1,11 @@
 package com.athimue.domain.repository
 
-import com.athimue.domain.model.Artist
+import kotlinx.coroutines.flow.Flow
 
 interface FavoriteTracksRepository {
-    suspend fun getFavoriteArtists(): List<Artist>
+
+    suspend fun addFavorite(trackId: Long)
+
+    suspend fun getFavorites(): Flow<List<Long>>
+
 }

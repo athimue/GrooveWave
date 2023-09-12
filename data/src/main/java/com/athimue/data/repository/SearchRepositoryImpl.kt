@@ -1,6 +1,5 @@
 package com.athimue.data.repository
 
-import android.util.Log
 import com.athimue.data.network.api.DeezerApi
 import com.athimue.data.network.dto.album.AlbumDto
 import com.athimue.data.network.dto.album.toAlbum
@@ -26,11 +25,9 @@ class SearchRepositoryImpl @Inject constructor(
             runCatching {
                 val response = deezerApi.getTrack(id)
                 response.takeIf { it.isSuccessful }?.body()?.let {
-                    Log.d("COUCOU success", it.toString())
                     emit(Resource.Success(it.toTrack()))
                 } ?: emit(Resource.Error("No data"))
             }.getOrElse {
-                Log.d("COUCOU else", it.toString())
                 emit(Resource.Error(it.toString()))
             }
         }

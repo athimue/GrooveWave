@@ -1,6 +1,5 @@
 package com.athimue.app.composable.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.athimue.app.composable.playlist.PlaylistUiModel
@@ -26,7 +25,8 @@ class SearchViewModel @Inject constructor(
     private val getArtistSearchUseCase: GetArtistSearchUseCase,
     private val getTrackInfoUseCase: GetTrackInfoUseCase,
     private val getPlaylistUseCase: GetPlaylistUseCase,
-    private val playlistRepository: PlaylistRepository
+    private val playlistRepository: PlaylistRepository,
+    private val addFavoriteTrackUseCase: AddFavoriteTrackUseCase
 ) : ViewModel() {
 
     var uiState: MutableStateFlow<SearchUiState> =
@@ -38,7 +38,6 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             getPlaylistUseCase.invoke().collect {
                 uiState.value = uiState.value.copy(playlists = it.map { playlist ->
-                    Log.d("COUCOU", playlist.toString())
                     PlaylistUiModel(
                         id = playlist.id,
                         name = playlist.name,
@@ -78,6 +77,13 @@ class SearchViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+
+    fun addTrackToFavorite(trackId: Long) {
+        viewModelScope.launch {
+            addFavoriteTrackUseCase.invoke(trackId)
         }
     }
 
