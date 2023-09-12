@@ -1,5 +1,6 @@
 package com.athimue.app.composable.library
 
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -7,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,14 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.athimue.app.R
-import com.athimue.app.composable.home.PopularTitle
+import com.athimue.app.composable.common.TitleText
 import com.athimue.domain.model.Playlist
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryComposable(
     viewModel: LibraryViewModel = hiltViewModel(),
@@ -53,38 +56,16 @@ fun LibraryComposable(
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            PopularTitle(title = "Your library")
+            TitleText(title = "Your library")
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(
                     items = uiState.playlists,
                     key = { item -> item.id }) {
-                    val currentItem by rememberUpdatedState(it)
-                    val dismissState = rememberDismissState(
-                        confirmValueChange = { dismissValue ->
-                            when (dismissValue) {
-                                DismissValue.DismissedToEnd -> {
-                                    onEditPlaylist(currentItem.id)
-                                    true
-                                }
-                                DismissValue.DismissedToStart -> {
-                                    viewModel.deletePlaylist(currentItem.id)
-                                    true
-                                }
-                                else -> false
-                            }
-                        }
-                    )
-                    SwipeToDismiss(
-                        state = dismissState,
-                        modifier = Modifier
-                            .padding(vertical = 1.dp)
-                            .animateItemPlacement(),
-                        background = {
-                            SwipeBackground(dismissState)
-                        },
-                        dismissContent = {
-                            PlaylistItemRow(it, onPlaylistClick)
-                        }
+                    LibrarySwipeToDismiss(
+                        playlist = it,
+                        onPlaylistClick = onPlaylistClick,
+                        onEditPlaylist = onEditPlaylist,
+                        onDeletePlaylist = { playlistId -> viewModel.deletePlaylist(playlistId) }
                     )
                 }
             }
@@ -104,15 +85,67 @@ fun LibraryComposable(
                 }
             }
             if (openDialog) {
+                val context = LocalContext.current
                 PlaylistDialog(
                     playlistName = playlistName,
-                    onCreatePlaylist = { viewModel.createPlaylist(it) },
+                    onCreatePlaylist = {
+                        Toast.makeText(
+                            context,
+                            "Playlist added !",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                        viewModel.createPlaylist(it)
+                    },
                     updatePlaylistName = { playlistName = it },
                     openDialog = { openDialog = false },
                 )
             }
         }
     }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+private fun LazyItemScope.LibrarySwipeToDismiss(
+    playlist: Playlist,
+    onPlaylistClick: (Int) -> Unit,
+    onEditPlaylist: (Int) -> Unit,
+    onDeletePlaylist: (Int) -> Unit
+) {
+    val context = LocalContext.current
+    val currentItem by rememberUpdatedState(playlist)
+    val dismissState = rememberDismissState(
+        confirmValueChange = { dismissValue ->
+            when (dismissValue) {
+                DismissValue.DismissedToEnd -> {
+                    onEditPlaylist(currentItem.id)
+                    true
+                }
+                DismissValue.DismissedToStart -> {
+                    Toast.makeText(
+                        context, "Playlist deleted !", Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    onDeletePlaylist(currentItem.id)
+                    true
+                }
+                else -> false
+            }
+        }
+    )
+    SwipeToDismiss(
+        state = dismissState,
+        modifier = Modifier
+            .padding(vertical = 1.dp)
+            .animateItemPlacement(),
+        background = {
+            SwipeBackground(dismissState)
+        },
+        dismissContent = {
+            PlaylistItemRow(playlist, onPlaylistClick)
+        }
+    )
 }
 
 @Composable
@@ -166,7 +199,7 @@ private fun PlaylistModal(
     displayBottomSheet: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        PopularTitle(title = "Playlist menu")
+        TitleText(title = "Playlist menu")
         Row(
             modifier = Modifier.padding(10.dp)
         ) {

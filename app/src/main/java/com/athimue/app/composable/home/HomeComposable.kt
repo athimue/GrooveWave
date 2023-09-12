@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,13 +25,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.athimue.app.R
+import com.athimue.app.composable.common.TitleText
 
 @Composable
 fun HomeComposable(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.homeUiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     HomeComposableContent(uiState = uiState, modifier = modifier)
 }
 
@@ -56,26 +56,25 @@ fun HomeComposableContent(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .verticalScroll(state = scrollState)
         ) {
             uiState.tracks?.let {
-                PopularRow(R.string.popular_tracks, R.string.no_popular_tracks, it)
+                HomeLazyRow(R.string.popular_tracks, R.string.no_popular_tracks, it)
             }
             uiState.albums?.let {
-                PopularRow(R.string.popular_albums, R.string.no_popular_albums, it)
+                HomeLazyRow(R.string.popular_albums, R.string.no_popular_albums, it)
             }
             uiState.artists?.let {
-                PopularRow(R.string.popular_artists, R.string.no_popular_artists, it)
+                HomeLazyRow(R.string.popular_artists, R.string.no_popular_artists, it)
             }
         }
     }
 }
 
 @Composable
-fun ColumnScope.PopularRow(
+fun ColumnScope.HomeLazyRow(
     titleId: Int, errorTitle: Int, items: List<LazyRowItemModel>
 ) {
-    PopularTitle(stringResource(id = titleId))
+    TitleText(stringResource(id = titleId))
     if (items.isEmpty()) {
         ErrorTitle(stringResource(id = errorTitle))
     } else {
@@ -89,20 +88,6 @@ fun ColumnScope.PopularRow(
             }
         }
     }
-}
-
-@Composable
-fun PopularTitle(title: String) {
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.primary,
-        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-        fontFamily = FontFamily.Monospace,
-        text = title
-    )
 }
 
 @Composable

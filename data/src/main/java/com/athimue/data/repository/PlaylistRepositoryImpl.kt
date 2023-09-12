@@ -38,7 +38,7 @@ class PlaylistRepositoryImpl @Inject constructor(
 
     override suspend fun addPlaylist(name: String) {
         playlistDao.insert(
-            playlistEntity = PlaylistEntity(
+            PlaylistEntity(
                 name = name,
                 tracks = emptyList()
             )

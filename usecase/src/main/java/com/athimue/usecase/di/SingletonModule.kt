@@ -15,7 +15,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class SingletonModule {
 
     @Binds
-    abstract fun provideGetPopularTracksUseCase(getPopularTracksUseCaseImpl: GetPopularTracksUseCaseImpl): GetPopularTracksUseCaseInputOutput
+    abstract fun provideGetPopularTracksUseCase(getPopularTracksUseCaseImpl: GetPopularTracksUseCaseImpl): GetPopularTracksUseCase
 
     @Binds
     abstract fun provideGetPopularArtistsUseCase(getPopularArtistsUseCaseImpl: GetPopularArtistsUseCaseImpl): GetPopularArtistsUseCase
@@ -37,4 +37,17 @@ abstract class SingletonModule {
 
     @Binds
     abstract fun provideGetTrackUseCase(getTrackInfoUseCase: GetTrackInfoUseCaseImpl): GetTrackInfoUseCase
+
+    @Binds
+    abstract fun provideAddFavoriteTrackUseCase(addFavoriteTrackUseCase: AddFavoriteTrackUseCaseImpl): AddFavoriteTrackUseCase
+
+    @Binds
+    abstract fun provideGetFavoriteAlbumsUseCase(getFavoriteAlbumsUseCase: GetFavoriteAlbumsUseCaseImpl): GetFavoriteAlbumsUseCase
+
+    @Binds
+    abstract fun provideGetFavoriteArtistsUseCase(getFavoriteArtistsUseCase: GetFavoriteArtistsUseCaseImpl): GetFavoriteArtistsUseCase
+
+    @Binds
+    abstract fun provideGetFavoriteTrackUseCase(getFavoriteTrackUseCase: GetFavoriteTracksUseCaseImpl): GetFavoriteTracksUseCase
+
 }

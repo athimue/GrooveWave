@@ -1,5 +1,6 @@
 package com.athimue.app.composable.search
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -30,7 +32,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.athimue.app.R
 import com.athimue.app.R.string
-import com.athimue.app.composable.home.PopularTitle
+import com.athimue.app.composable.common.LoaderItem
+import com.athimue.app.composable.common.TitleText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,11 +68,7 @@ fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
             )
         } else {
             if (uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        modifier = Modifier, color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                LoaderItem()
             } else SearchGrid(
                 searchResults = uiState.searchResult,
                 isPlaylistBtnDisplayed = filterSelected == "Track",
@@ -77,7 +76,7 @@ fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
                     trackSelected = it
                     isBottomSheetDisplayed = true
                 },
-                onFavBtnClick = {},
+                onFavBtnClick = { viewModel.addTrackToFavorite(it) },
             )
         }
         if (isBottomSheetDisplayed) {
@@ -85,10 +84,13 @@ fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
                 onDismissRequest = { isBottomSheetDisplayed = false },
                 sheetState = bottomSheetState
             ) {
+                val context = LocalContext.current
                 Scaffold(
                     floatingActionButtonPosition = FabPosition.Center,
                     floatingActionButton = {
                         Button(onClick = {
+                            Toast.makeText(context, "Track added to playlist !", Toast.LENGTH_SHORT)
+                                .show()
                             viewModel.addTrackToPlaylist(playlistSelected, trackSelected)
                             isBottomSheetDisplayed = false
                         }) {
@@ -125,7 +127,9 @@ fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
                         Divider()
                         LazyColumn {
                             items(items = uiState.playlists) {
-                                Row {
+                                Row(
+                                    modifier = Modifier.clickable { playlistSelected = it.id }
+                                ) {
                                     Image(
                                         painter = if (it.tracks.isNotEmpty()) rememberAsyncImagePainter(
                                             it.tracks[0].cover
@@ -169,7 +173,7 @@ fun SearchComposable(viewModel: SearchViewModel = hiltViewModel()) {
 @Composable
 fun SearchBar(query: TextFieldValue, onQueryChange: (TextFieldValue) -> Unit) {
     Column {
-        PopularTitle(title = stringResource(id = string.search))
+        TitleText(title = stringResource(id = string.search))
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
