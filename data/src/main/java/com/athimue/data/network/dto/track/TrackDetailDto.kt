@@ -22,6 +22,7 @@ data class TrackDetailDto(
     @SerializedName("explicit_lyrics") val explicitLyrics: Boolean,
     @SerializedName("explicit_content_lyrics") val explicitContentLyrics: Int,
     @SerializedName("explicit_content_cover") val explicitContentCover: Int,
+    @SerializedName("preview") val preview: String,
     @SerializedName("bpm") val bpm: Float,
     @SerializedName("gain") val gain: Float,
     @SerializedName("available_countries") val availableCountries: List<String>,
@@ -35,8 +36,13 @@ data class TrackDetailDto(
 fun TrackDetailDto.toTrack() = Track(
     id = id.toLong(),
     title = title,
-    duration = duration.toInt(),
+    titleShort = title_short,
     link = link,
+    duration = duration.toInt(),
+    rank = rank.toInt(),
+    explicitLyrics = explicitLyrics,
+    preview = preview,
+    position = trackPosition,
     cover = album.coverXl,
     artist = artist.toArtist(),
     album = album.toAlbum()

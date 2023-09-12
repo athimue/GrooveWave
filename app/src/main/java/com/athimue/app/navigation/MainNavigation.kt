@@ -52,18 +52,36 @@ fun MainNavigation() {
             startDestination = Screen.Home.route
         ) {
             composable(Screen.Home.route) {
-                HomeComposable()
+                HomeComposable(
+                    onTrackClick = { trackId ->
+                        navController.navigate(
+                            Screen.Track.route.replace(
+                                oldValue = "{trackId}",
+                                newValue = trackId.toString()
+                            )
+                        )
+                    },
+                )
             }
             composable(Screen.Search.route) {
-                SearchComposable()
+                SearchComposable(
+                    onTrackClick = { trackId ->
+                        navController.navigate(
+                            Screen.Track.route.replace(
+                                oldValue = "{trackId}",
+                                newValue = trackId.toString()
+                            )
+                        )
+                    },
+                )
             }
             composable(Screen.Library.route) {
                 LibraryComposable(
-                    onPlaylistClick = {
+                    onPlaylistClick = { playlistId ->
                         navController.navigate(
                             Screen.Playlist.route.replace(
                                 oldValue = "{playlistId}",
-                                newValue = it.toString()
+                                newValue = playlistId.toString()
                             )
                         )
                     },
@@ -84,8 +102,16 @@ fun MainNavigation() {
                     onBack = { navController.navigate(Screen.Library.route) }
                 )
             }
-            composable(Screen.Track.route) {
-                TrackComposable()
+            composable(
+                route = Screen.Track.route,
+                arguments = listOf(navArgument("trackId") {
+                    type = NavType.LongType
+                    defaultValue = -1
+                })
+            ) { trackId ->
+                TrackComposable(
+                    trackId = trackId.arguments?.getLong("trackId") ?: -1,
+                    onBack = { navController.navigate(Screen.Home.route) })
             }
         }
     }

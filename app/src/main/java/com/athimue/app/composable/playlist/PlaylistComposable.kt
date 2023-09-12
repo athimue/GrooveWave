@@ -1,5 +1,8 @@
 package com.athimue.app.composable.playlist
 
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -19,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.athimue.app.R
 import com.athimue.app.composable.common.BackButton
+import com.athimue.app.composable.common.CoverItem
 import com.athimue.app.composable.common.LoaderItem
 import com.athimue.app.composable.common.PrimaryColorText
 import com.athimue.domain.model.Track
@@ -57,21 +60,12 @@ fun PlaylistComposable(
                     )
             ) {
                 BackButton(onBack)
-                Image(
-                    painter = if (it.tracks.isNotEmpty()) rememberAsyncImagePainter(
-                        it.tracks[0].cover
-                    )
+                CoverItem(
+                    painter = if (it.tracks.isNotEmpty())
+                        rememberAsyncImagePainter(it.tracks[0].cover)
                     else {
                         painterResource(id = R.drawable.playlist_cover)
-                    },
-                    contentDescription = "",
-                    alignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(top = 4.dp, bottom = 4.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .padding(bottom = 3.dp)
-                        .align(CenterHorizontally)
+                    }
                 )
                 PlaylistItemText(
                     text = it.name
@@ -107,6 +101,7 @@ private fun PlaylistTracksLazyColumn(
     playlistId: Int,
     onSwipeToDismiss: (Long, Int) -> Unit,
 ) {
+    Log.d("COUCOU", tracks.toString())
     LazyColumn(
         modifier = Modifier.padding(start = 10.dp, top = 5.dp)
     ) {
@@ -171,13 +166,13 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
         directions = setOf(DismissDirection.EndToStart),
         dismissContent = {
             TrackRowItem(track)
-            Divider()
         }
     )
 }
 
 @Composable
 private fun TrackRowItem(it: Track) {
+    val mediaPlayer = MediaPlayer()
     Row(
         modifier = Modifier
             .padding(vertical = 5.dp)
@@ -202,7 +197,21 @@ private fun TrackRowItem(it: Track) {
             PrimaryColorText(it.artist.name)
         }
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                mediaPlayer.setAudioAttributes(
+                    AudioAttributes
+                        .Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                try {
+                    mediaPlayer.setDataSource(it.preview)
+                    mediaPlayer.prepare()
+                    mediaPlayer.start()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            },
             modifier = Modifier.align(CenterVertically),
         ) {
             Image(
@@ -212,6 +221,7 @@ private fun TrackRowItem(it: Track) {
             )
         }
     }
+    Divider()
 }
 
 @Composable
