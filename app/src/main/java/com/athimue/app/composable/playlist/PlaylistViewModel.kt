@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.athimue.domain.model.Track
 import com.athimue.domain.repository.PlaylistRepository
-import com.athimue.domain.usecase.GetTrackInfoUseCase
+import com.athimue.domain.usecase.gettrackinfo.GetTrackInfoUseCase
 import com.athimue.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

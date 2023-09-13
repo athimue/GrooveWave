@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
-import com.athimue.domain.usecase.GetPopularAlbumsUseCase
-import com.athimue.domain.usecase.GetPopularArtistsUseCase
-import com.athimue.domain.usecase.GetPopularTracksUseCase
+import com.athimue.domain.usecase.getpopularalbums.GetPopularAlbumsUseCase
+import com.athimue.domain.usecase.getpopularartists.GetPopularArtistsUseCase
+import com.athimue.domain.usecase.getpopulartracks.GetPopularTracksUseCase
 import com.athimue.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
