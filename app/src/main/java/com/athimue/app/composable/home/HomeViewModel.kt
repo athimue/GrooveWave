@@ -8,7 +8,6 @@ import com.athimue.domain.model.Track
 import com.athimue.domain.usecase.getpopularalbums.GetPopularAlbumsUseCase
 import com.athimue.domain.usecase.getpopularartists.GetPopularArtistsUseCase
 import com.athimue.domain.usecase.getpopulartracks.GetPopularTracksUseCase
-import com.athimue.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -28,34 +27,22 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getPopularTracksUseCase.invoke().collect { result ->
-                when (result) {
-                    is Resource.Success -> uiState.value =
-                        uiState.value.copy(tracks = result.data.map { it.toLazyRowItemModel() })
-                    is Resource.Error -> {
-                        uiState.value = uiState.value.copy(tracks = emptyList())
-                    }
-                }
+            getPopularTracksUseCase.invoke().collect {
+                uiState.value =
+                    uiState.value.copy(tracks = it.getOrElse { emptyList() }
+                        .map { track -> track.toLazyRowItemModel() })
             }
-            getPopularAlbumsUseCase.invoke().collect { result ->
-                when (result) {
-                    is Resource.Success -> uiState.value =
-                        uiState.value.copy(albums = result.data.map {
-                            it.toLazyRowItemModel()
-                        })
-                    is Resource.Error -> uiState.value =
-                        uiState.value.copy(albums = emptyList())
-                }
+            getPopularAlbumsUseCase.invoke().collect {
+                uiState.value =
+                    uiState.value.copy(albums = it.getOrElse { emptyList() }.map { album ->
+                        album.toLazyRowItemModel()
+                    })
             }
-            getPopularArtistsUseCase.invoke().collect { result ->
-                when (result) {
-                    is Resource.Success -> uiState.value =
-                        uiState.value.copy(artists = result.data.map {
-                            it.toLazyRowItemModel()
-                        })
-                    is Resource.Error -> uiState.value =
-                        uiState.value.copy(artists = emptyList())
-                }
+            getPopularArtistsUseCase.invoke().collect {
+                uiState.value =
+                    uiState.value.copy(artists = it.getOrElse { emptyList() }.map { artist ->
+                        artist.toLazyRowItemModel()
+                    })
             }
         }
     }

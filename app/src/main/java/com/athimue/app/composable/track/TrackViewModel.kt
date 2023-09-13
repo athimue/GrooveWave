@@ -3,7 +3,6 @@ package com.athimue.app.composable.track
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.athimue.domain.usecase.gettrackinfo.GetTrackInfoUseCase
-import com.athimue.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -20,10 +19,7 @@ class TrackViewModel @Inject constructor(
     fun loadTrack(trackId: Long) {
         viewModelScope.launch {
             getTrackInfoUseCase.invoke(trackId).collect {
-                when (it) {
-                    is Resource.Success -> uiState.value = uiState.value.copy(track = it.data)
-                    is Resource.Error -> {}
-                }
+                it.getOrNull()?.let { track -> uiState.value = uiState.value.copy(track = track) }
             }
         }
     }

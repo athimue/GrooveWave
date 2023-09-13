@@ -1,6 +1,6 @@
 package com.athimue.domain.usecase.addfavoritetrack
 
-import com.athimue.domain.usecase.SuspendWithInputUseCase
+import com.athimue.domain.usecase.SuspendOneInputUseCase
 
-interface AddFavoriteTrackUseCase : SuspendWithInputUseCase<Long, Unit> {
+interface AddFavoriteTrackUseCase : SuspendOneInputUseCase<Long, Unit> {
 }

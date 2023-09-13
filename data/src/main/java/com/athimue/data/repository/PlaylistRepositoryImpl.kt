@@ -3,7 +3,8 @@ package com.athimue.data.repository
 import com.athimue.data.database.dao.PlaylistDao
 import com.athimue.data.database.entity.PlaylistEntity
 import com.athimue.data.database.entity.TrackEntity
-import com.athimue.data.database.entity.toPlaylist
+import com.athimue.data.network.api.DeezerApi
+import com.athimue.data.network.dto.track.toTrack
 import com.athimue.domain.model.Playlist
 import com.athimue.domain.repository.PlaylistRepository
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class PlaylistRepositoryImpl @Inject constructor(
-    private val playlistDao: PlaylistDao
+    private val playlistDao: PlaylistDao,
+    private val deezerApi: DeezerApi
 ) : PlaylistRepository {
 
     override suspend fun addTrack(playlistId: Int, trackId: Long) {
@@ -50,8 +52,28 @@ class PlaylistRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPlaylist(playlistId: Int): Flow<Playlist> =
-        playlistDao.getPlaylist(playlistId).map(PlaylistEntity::toPlaylist)
+        playlistDao.getPlaylist(playlistId).map { playlistEntity ->
+            Playlist(
+                id = playlistEntity.id,
+                name = playlistEntity.name,
+                tracks = playlistEntity.tracks.mapNotNull { trackEntity ->
+                    deezerApi.getTrack(trackEntity.id).takeIf { it.isSuccessful }
+                        ?.body()?.toTrack()
+                }
+            )
+        }
 
     override suspend fun getPlaylists(): Flow<List<Playlist>> =
-        playlistDao.getPlaylists().map { playlists -> playlists.map { it.toPlaylist() } }
+        playlistDao.getPlaylists().map { playlistEntities ->
+            playlistEntities.map { playlistEntity ->
+                Playlist(
+                    id = playlistEntity.id,
+                    name = playlistEntity.name,
+                    tracks = playlistEntity.tracks.mapNotNull { trackEntity ->
+                        deezerApi.getTrack(trackEntity.id).takeIf { it.isSuccessful }
+                            ?.body()?.toTrack()
+                    }
+                )
+            }
+        }
 }

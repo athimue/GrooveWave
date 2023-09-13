@@ -1,12 +1,16 @@
 package com.athimue.domain.di
 
 import com.athimue.domain.usecase.addfavoritetrack.*
+import com.athimue.domain.usecase.deleteplaylisttrack.DeletePlaylistTrackUseCase
+import com.athimue.domain.usecase.deleteplaylisttrack.DeletePlaylistTrackUseCaseImpl
 import com.athimue.domain.usecase.getalbumsearch.*
 import com.athimue.domain.usecase.getartistsearch.*
 import com.athimue.domain.usecase.getfavoritealbums.*
 import com.athimue.domain.usecase.getfavoriteartists.*
 import com.athimue.domain.usecase.getfavoritetracks.*
-import com.athimue.domain.usecase.getplaylist.*
+import com.athimue.domain.usecase.getplaylistinfo.GetPlaylistInfoUseCase
+import com.athimue.domain.usecase.getplaylistinfo.GetPlaylistInfoUseCaseImpl
+import com.athimue.domain.usecase.getplaylists.*
 import com.athimue.domain.usecase.getpopularalbums.*
 import com.athimue.domain.usecase.getpopularartists.*
 import com.athimue.domain.usecase.getpopulartracks.*
@@ -40,7 +44,7 @@ abstract class SingletonModule {
     abstract fun provideGetArtistSearchUseCase(getArtistSearchUseCase: GetArtistSearchUseCaseImpl): GetArtistSearchUseCase
 
     @Binds
-    abstract fun provideGetPlaylistsUseCase(getPlaylistUseCase: GetPlaylistUseCaseImpl): GetPlaylistUseCase
+    abstract fun provideGetPlaylistsUseCase(getPlaylistUseCase: GetPlaylistUseCaseImpl): GetPlaylistsUseCase
 
     @Binds
     abstract fun provideGetTrackUseCase(getTrackInfoUseCase: GetTrackInfoUseCaseImpl): GetTrackInfoUseCase
@@ -57,4 +61,9 @@ abstract class SingletonModule {
     @Binds
     abstract fun provideGetFavoriteTrackUseCase(getFavoriteTrackUseCase: GetFavoriteTracksUseCaseImpl): GetFavoriteTracksUseCase
 
+    @Binds
+    abstract fun provideDeletePlaylistTrackUseCase(deletePlaylistTrackUseCase: DeletePlaylistTrackUseCaseImpl): DeletePlaylistTrackUseCase
+
+    @Binds
+    abstract fun provideGetPlaylistInfoUseCase(getPlaylistInfoUseCase: GetPlaylistInfoUseCaseImpl): GetPlaylistInfoUseCase
 }

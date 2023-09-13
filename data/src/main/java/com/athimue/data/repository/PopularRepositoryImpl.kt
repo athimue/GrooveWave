@@ -11,7 +11,6 @@ import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
 import com.athimue.domain.repository.PopularRepository
-import com.athimue.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -23,47 +22,47 @@ class PopularRepositoryImpl @Inject constructor(
     private val deezerApi: DeezerApi
 ) : PopularRepository {
 
-    override suspend fun getPopularTracks(): Flow<Resource<List<Track>>> {
+    override suspend fun getPopularTracks(): Flow<Result<List<Track>>> {
         return flow {
             runCatching {
                 val response = deezerApi.getChartTracks()
                 response.takeIf { it.isSuccessful }
                     ?.body()
                     ?.let {
-                        emit(Resource.Success(it.data.map(TrackDto::toTrack)))
-                    } ?: emit(Resource.Error("No data"))
+                        emit(Result.success(it.data.map(TrackDto::toTrack)))
+                    } ?: emit(Result.failure(Throwable("No data")))
             }.getOrElse {
-                emit(Resource.Error(it.toString()))
+                emit(Result.failure(Throwable(it.toString())))
             }
         }
     }
 
-    override suspend fun getPopularArtists(): Flow<Resource<List<Artist>>> {
+    override suspend fun getPopularArtists(): Flow<Result<List<Artist>>> {
         return flow {
             runCatching {
                 val response = deezerApi.getChartArtists()
                 response.takeIf { it.isSuccessful }
                     ?.body()
                     ?.let {
-                        emit(Resource.Success(it.data.map(ArtistDto::toArtist)))
-                    } ?: emit(Resource.Error("No data"))
+                        emit(Result.success(it.data.map(ArtistDto::toArtist)))
+                    } ?: emit(Result.failure(Throwable("No data")))
             }.getOrElse {
-                emit(Resource.Error(it.toString()))
+                emit(Result.failure(Throwable(it.toString())))
             }
         }
     }
 
-    override suspend fun getPopularAlbums(): Flow<Resource<List<Album>>> {
+    override suspend fun getPopularAlbums(): Flow<Result<List<Album>>> {
         return flow {
             runCatching {
                 val response = deezerApi.getChartAlbums()
                 response.takeIf { it.isSuccessful }
                     ?.body()
                     ?.let {
-                        emit(Resource.Success(it.data.map(AlbumDto::toAlbum)))
-                    } ?: emit(Resource.Error("No data"))
+                        emit(Result.success(it.data.map(AlbumDto::toAlbum)))
+                    } ?: emit(Result.failure(Throwable("No data")))
             }.getOrElse {
-                emit(Resource.Error(it.toString()))
+                emit(Result.failure(Throwable(it.toString())))
             }
         }
     }
