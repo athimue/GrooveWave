@@ -4,14 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.athimue.app.composable.search.SearchResultModel
 import com.athimue.domain.model.Track
-import com.athimue.domain.usecase.GetFavoriteTracksUseCase
+import com.athimue.domain.usecase.getfavoritetracks.GetFavoriteTracksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavoritesViewModel @Inject constructor(
+internal class FavoritesViewModel @Inject constructor(
     private val getFavoriteTracksUseCase: GetFavoriteTracksUseCase,
 ) : ViewModel() {
 

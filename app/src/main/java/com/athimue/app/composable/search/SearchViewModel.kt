@@ -7,8 +7,13 @@ import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
 import com.athimue.domain.repository.PlaylistRepository
-import com.athimue.domain.usecase.*
-import com.athimue.domain.usecase.definition.SuspendWithInputUseCase
+import com.athimue.domain.usecase.SuspendWithInputUseCase
+import com.athimue.domain.usecase.addfavoritetrack.AddFavoriteTrackUseCase
+import com.athimue.domain.usecase.getalbumsearch.GetAlbumSearchUseCase
+import com.athimue.domain.usecase.getartistsearch.GetArtistSearchUseCase
+import com.athimue.domain.usecase.getplaylist.GetPlaylistUseCase
+import com.athimue.domain.usecase.gettrackinfo.GetTrackInfoUseCase
+import com.athimue.domain.usecase.gettracksearch.GetTrackSearchUseCase
 import com.athimue.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

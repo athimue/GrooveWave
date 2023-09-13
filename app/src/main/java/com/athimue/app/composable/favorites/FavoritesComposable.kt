@@ -21,7 +21,7 @@ import com.athimue.app.composable.common.TitleText
 import com.athimue.app.composable.search.SearchResultModel
 
 @Composable
-fun FavoritesComposable(viewModel: FavoritesViewModel = hiltViewModel()) {
+internal fun FavoritesComposable(viewModel: FavoritesViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val titles = listOf("Tracks", "Artists", "Albums")
     var tabSelected by remember { mutableStateOf(0) }

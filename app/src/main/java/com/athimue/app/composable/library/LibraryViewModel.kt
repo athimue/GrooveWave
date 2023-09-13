@@ -3,7 +3,7 @@ package com.athimue.app.composable.library
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.athimue.domain.repository.PlaylistRepository
-import com.athimue.domain.usecase.GetPlaylistUseCase
+import com.athimue.domain.usecase.getplaylist.GetPlaylistUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
