@@ -1,4 +1,4 @@
-package com.athimue.domain.usecase.getplaylist
+package com.athimue.domain.usecase.getplaylists
 
 import com.athimue.domain.model.Playlist
 import com.athimue.domain.repository.PlaylistRepository
@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class GetPlaylistUseCaseImpl @Inject constructor(
     private val playlistRepository: PlaylistRepository
-) : GetPlaylistUseCase {
+) : GetPlaylistsUseCase {
 
     override suspend fun invoke(): Flow<List<Playlist>> =
         playlistRepository.getPlaylists()

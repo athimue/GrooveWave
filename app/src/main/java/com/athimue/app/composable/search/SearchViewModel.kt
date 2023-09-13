@@ -7,14 +7,13 @@ import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
 import com.athimue.domain.repository.PlaylistRepository
-import com.athimue.domain.usecase.SuspendWithInputUseCase
+import com.athimue.domain.usecase.SuspendOneInputUseCase
 import com.athimue.domain.usecase.addfavoritetrack.AddFavoriteTrackUseCase
 import com.athimue.domain.usecase.getalbumsearch.GetAlbumSearchUseCase
 import com.athimue.domain.usecase.getartistsearch.GetArtistSearchUseCase
-import com.athimue.domain.usecase.getplaylist.GetPlaylistUseCase
+import com.athimue.domain.usecase.getplaylists.GetPlaylistsUseCase
 import com.athimue.domain.usecase.gettrackinfo.GetTrackInfoUseCase
 import com.athimue.domain.usecase.gettracksearch.GetTrackSearchUseCase
-import com.athimue.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,7 +28,7 @@ class SearchViewModel @Inject constructor(
     private val getAlbumSearchUseCase: GetAlbumSearchUseCase,
     private val getArtistSearchUseCase: GetArtistSearchUseCase,
     private val getTrackInfoUseCase: GetTrackInfoUseCase,
-    private val getPlaylistUseCase: GetPlaylistUseCase,
+    private val getPlaylistsUseCase: GetPlaylistsUseCase,
     private val playlistRepository: PlaylistRepository,
     private val addFavoriteTrackUseCase: AddFavoriteTrackUseCase
 ) : ViewModel() {
@@ -41,12 +40,12 @@ class SearchViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getPlaylistUseCase.invoke().collect {
+            getPlaylistsUseCase.invoke().collect {
                 uiState.value = uiState.value.copy(playlists = it.map { playlist ->
                     PlaylistUiModel(
                         id = playlist.id,
                         name = playlist.name,
-                        tracks = loadPlaylistTracks(playlist.tracks)
+                        tracks = playlist.tracks
                     )
                 })
             }
@@ -101,37 +100,15 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadPlaylistTracks(ids: List<Long>): List<Track> {
-        val tracks = mutableListOf<Track>()
-        ids.forEach { trackId ->
-            getTrackInfoUseCase.invoke(trackId).collect {
-                when (it) {
-                    is Resource.Success ->
-                        tracks.add(it.data)
-                    else -> {}
-                }
-            }
-        }
-        return tracks
-    }
-
     private suspend fun <T> searchByQuery(
-        getSearchUseCase: SuspendWithInputUseCase<String, Flow<Resource<List<T>>>>,
+        getSearchUseCase: SuspendOneInputUseCase<String, Flow<Result<List<T>>>>,
         mapper: (T) -> SearchResultModel,
         query: String
     ) {
-        getSearchUseCase.invoke(query).collect { result ->
-            when (result) {
-                is Resource.Success -> {
-                    uiState.value = uiState.value.copy(
-                        isLoading = false,
-                        searchResult = result.data.map { mapper(it) })
-                }
-                is Resource.Error -> {
-                    uiState.value =
-                        uiState.value.copy(isLoading = false, searchResult = emptyList())
-                }
-            }
+        getSearchUseCase.invoke(query).collect {
+            uiState.value = uiState.value.copy(
+                isLoading = false,
+                searchResult = it.getOrElse { emptyList() }.map { result -> mapper(result) })
         }
     }
 
