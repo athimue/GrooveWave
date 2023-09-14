@@ -9,7 +9,7 @@ data class Track(
     val rank: Int,
     val explicitLyrics: Boolean,
     val preview: String,
-    val position: Int,
+    val position: Int?,
     val cover: String,
     val artist: Artist,
     val album: Album

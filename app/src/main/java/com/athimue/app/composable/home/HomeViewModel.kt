@@ -13,9 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * View model to get a text using [GetPopularTracksUseCase].
- */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getPopularTracksUseCase: GetPopularTracksUseCase,
@@ -50,7 +47,9 @@ class HomeViewModel @Inject constructor(
     private fun Track.toLazyRowItemModel(): LazyRowItemModel =
         LazyRowItemModel(id, titleShort, cover)
 
-    private fun Album.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(id, name, cover)
+    private fun Album.toLazyRowItemModel(): LazyRowItemModel =
+        LazyRowItemModel(id, name, cover)
 
-    private fun Artist.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(id, name, cover)
+    private fun Artist.toLazyRowItemModel(): LazyRowItemModel =
+        LazyRowItemModel(id, name, cover)
 }

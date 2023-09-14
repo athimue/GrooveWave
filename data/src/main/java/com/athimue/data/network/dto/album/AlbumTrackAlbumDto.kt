@@ -1,5 +1,6 @@
 package com.athimue.data.network.dto.album
 
+import com.athimue.domain.model.Album
 import com.google.gson.annotations.SerializedName
 
 data class AlbumTrackAlbumDto(
@@ -13,4 +14,12 @@ data class AlbumTrackAlbumDto(
     @SerializedName("md5_image") val md5Image: String,
     @SerializedName("tracklist") val tracklist: String,
     @SerializedName("type") val type: String
+)
+
+fun AlbumTrackAlbumDto.toAlbum() = Album(
+    id = id.toLong(),
+    name = title,
+    cover = coverXl,
+    genreId = null,
+    nbTracks = null
 )

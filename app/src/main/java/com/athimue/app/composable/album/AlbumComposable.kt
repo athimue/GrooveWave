@@ -16,6 +16,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.athimue.app.composable.common.BackButton
 import com.athimue.app.composable.common.CoverItem
 import com.athimue.app.composable.common.LoaderItem
+import com.athimue.app.composable.common.PrimaryColorText
 
 @Composable
 fun AlbumComposable(
@@ -40,6 +41,8 @@ fun AlbumComposable(
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center
             )
+            PrimaryColorText(text = "${it.nbTracks} tracks")
+            PrimaryColorText(text = "Genre id : ${it.genreId}")
         } ?: LoaderItem()
     }
 }

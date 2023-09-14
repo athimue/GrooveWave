@@ -7,7 +7,6 @@ import com.google.gson.annotations.SerializedName
 
 data class ChartTrackDto(
     @SerializedName("id") val id: Long,
-    @SerializedName("readable") val readable: Boolean?,
     @SerializedName("title") val title: String,
     @SerializedName("title_short") val title_short: String,
     @SerializedName("title_version") val title_version: String,

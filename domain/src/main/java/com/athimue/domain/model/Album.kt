@@ -4,4 +4,6 @@ data class Album(
     val id: Long,
     val name: String,
     val cover: String,
+    val genreId: Int?,
+    val nbTracks: Int?,
 )

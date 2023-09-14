@@ -39,4 +39,6 @@ fun AlbumDto.toAlbum() = Album(
     id = id.toLong(),
     name = title,
     cover = coverXl,
+    genreId = genreId,
+    nbTracks = nbTracks
 )
