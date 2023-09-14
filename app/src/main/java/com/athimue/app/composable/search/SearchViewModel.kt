@@ -127,14 +127,14 @@ class SearchViewModel @Inject constructor(
     private fun Album.toSearchResultModel(): SearchResultModel = SearchResultModel(
         id = id,
         title = name,
-        subTitle = id.toString(),
+        subTitle = "Tracks : $nbTracks",
         picture = cover,
     )
 
     private fun Artist.toSearchResultModel(): SearchResultModel = SearchResultModel(
         id = id,
         title = name,
-        subTitle = id.toString(),
+        subTitle = "Albums : $nbAlbum",
         picture = cover,
     )
 }

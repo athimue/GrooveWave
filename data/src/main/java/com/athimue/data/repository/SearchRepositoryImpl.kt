@@ -3,12 +3,12 @@ package com.athimue.data.repository
 import com.athimue.data.network.api.DeezerApi
 import com.athimue.data.network.dto.album.toAlbum
 import com.athimue.data.network.dto.artist.toArtist
-import com.athimue.data.network.dto.chartAlbum.ChartAlbumDto
-import com.athimue.data.network.dto.chartAlbum.toAlbum
-import com.athimue.data.network.dto.chartArtist.ChartArtistDto
-import com.athimue.data.network.dto.chartArtist.toArtist
-import com.athimue.data.network.dto.chartTrack.ChartTrackDto
-import com.athimue.data.network.dto.chartTrack.toTrack
+import com.athimue.data.network.dto.searchAlbum.SearchAlbumDto
+import com.athimue.data.network.dto.searchAlbum.toAlbum
+import com.athimue.data.network.dto.searchArtist.SearchArtistDto
+import com.athimue.data.network.dto.searchArtist.toArtist
+import com.athimue.data.network.dto.searchTrack.SearchTrackDto
+import com.athimue.data.network.dto.searchTrack.toTrack
 import com.athimue.data.network.dto.track.toTrack
 import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
@@ -40,7 +40,7 @@ class SearchRepositoryImpl @Inject constructor(
             runCatching {
                 val response = deezerApi.getSearchedTracks(query)
                 response.takeIf { it.isSuccessful }?.body()?.let {
-                    emit(Result.success(it.data.map(ChartTrackDto::toTrack)))
+                    emit(Result.success(it.data.map(SearchTrackDto::toTrack)))
                 } ?: emit(Result.failure(Throwable("No data")))
             }.getOrElse {
                 emit(Result.failure(Throwable(it.toString())))
@@ -66,7 +66,7 @@ class SearchRepositoryImpl @Inject constructor(
             runCatching {
                 val response = deezerApi.getSearchedAlbums(query)
                 response.takeIf { it.isSuccessful }?.body()?.let {
-                    emit(Result.success(it.data.map(ChartAlbumDto::toAlbum)))
+                    emit(Result.success(it.data.map(SearchAlbumDto::toAlbum)))
                 } ?: emit(Result.failure(Throwable("No data")))
             }.getOrElse {
                 emit(Result.failure(Throwable(it.toString())))
@@ -92,7 +92,7 @@ class SearchRepositoryImpl @Inject constructor(
             runCatching {
                 val response = deezerApi.getSearchedArtists(query)
                 response.takeIf { it.isSuccessful }?.body()?.let {
-                    emit(Result.success(it.data.map(ChartArtistDto::toArtist)))
+                    emit(Result.success(it.data.map(SearchArtistDto::toArtist)))
                 } ?: emit(Result.failure(Throwable("No data")))
             }.getOrElse {
                 emit(Result.failure(Throwable(it.toString())))

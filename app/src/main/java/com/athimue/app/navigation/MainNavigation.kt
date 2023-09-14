@@ -1,5 +1,6 @@
 package com.athimue.app.navigation
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -120,7 +122,7 @@ fun MainNavigation() {
             ) { playlistId ->
                 PlaylistComposable(
                     playlistId = playlistId.arguments?.getInt("playlistId") ?: -1,
-                    onBack = { navController.navigate(Screen.Library.route) }
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable(
@@ -133,7 +135,7 @@ fun MainNavigation() {
             ) { trackId ->
                 TrackComposable(
                     trackId = trackId.arguments?.getLong("trackId") ?: -1,
-                    onBack = { navController.navigate(Screen.Home.route) })
+                    onBack = { navController.popBackStack() })
             }
             composable(
                 route = Screen.Album.route,
@@ -145,7 +147,7 @@ fun MainNavigation() {
             ) { albumId ->
                 AlbumComposable(
                     albumId = albumId.arguments?.getLong("albumId") ?: -1,
-                    onBack = { navController.navigate(Screen.Home.route) })
+                    onBack = { navController.popBackStack() })
             }
             composable(
                 route = Screen.Artist.route,
@@ -157,7 +159,7 @@ fun MainNavigation() {
             ) { artistId ->
                 ArtistComposable(
                     artistId = artistId.arguments?.getLong("artistId") ?: -1,
-                    onBack = { navController.navigate(Screen.Home.route) })
+                    onBack = { navController.popBackStack() })
             }
         }
     }
@@ -175,37 +177,46 @@ fun MenuBottomBar(
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.secondaryContainer
     ) {
-        NavigationBarItem(selected = currentRoute == Screen.Home.route,
-            onClick = onHomeClick,
-            icon = { Icon(Icons.Rounded.Home, contentDescription = "Home") },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                unselectedTextColor = MaterialTheme.colorScheme.secondary
-            ),
-            label = { Text("Home") })
-        NavigationBarItem(selected = currentRoute == Screen.Search.route,
-            onClick = onSearchClick,
-            icon = { Icon(Icons.Rounded.Search, contentDescription = "Search") },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                unselectedTextColor = MaterialTheme.colorScheme.secondary
-            ),
-            label = { Text("Search") })
-        NavigationBarItem(selected = currentRoute == Screen.Library.route,
-            onClick = onLibraryClick,
-            icon = { Icon(Icons.Rounded.List, contentDescription = "Library") },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                unselectedTextColor = MaterialTheme.colorScheme.secondary
-            ),
-            label = { Text("Library") })
-        NavigationBarItem(selected = currentRoute == Screen.Favorites.route,
-            onClick = onFavoriteClick,
-            icon = { Icon(Icons.Rounded.Favorite, contentDescription = "Favorites") },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                unselectedTextColor = MaterialTheme.colorScheme.secondary
-            ),
-            label = { Text("Favorites") })
+        NavigationItem(
+            isSelected = currentRoute == Screen.Home.route,
+            text = "Home",
+            imageVector = Icons.Rounded.Home,
+            onClick = onHomeClick
+        )
+        NavigationItem(
+            isSelected = currentRoute == Screen.Search.route,
+            text = "Search",
+            imageVector = Icons.Rounded.Search,
+            onClick = onSearchClick
+        )
+        NavigationItem(
+            isSelected = currentRoute == Screen.Library.route,
+            text = "Library",
+            imageVector = Icons.Rounded.List,
+            onClick = onLibraryClick
+        )
+        NavigationItem(
+            isSelected = currentRoute == Screen.Favorites.route,
+            text = "Favorites",
+            imageVector = Icons.Rounded.Favorite,
+            onClick = onFavoriteClick
+        )
     }
+}
+
+@Composable
+private fun RowScope.NavigationItem(
+    isSelected: Boolean,
+    text: String,
+    imageVector: ImageVector,
+    onClick: () -> Unit,
+) {
+    NavigationBarItem(selected = isSelected,
+        onClick = onClick,
+        icon = { Icon(imageVector, contentDescription = text) },
+        colors = NavigationBarItemDefaults.colors(
+            unselectedIconColor = MaterialTheme.colorScheme.secondary,
+            unselectedTextColor = MaterialTheme.colorScheme.secondary
+        ),
+        label = { Text(text) })
 }

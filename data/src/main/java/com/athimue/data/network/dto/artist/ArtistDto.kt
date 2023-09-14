@@ -25,5 +25,6 @@ fun ArtistDto.toArtist() = Artist(
     name = name,
     link = link,
     cover = pictureXl,
-    nbAlbum = nbAlbum
+    nbAlbum = nbAlbum,
+    nbFan = nbFan,
 )

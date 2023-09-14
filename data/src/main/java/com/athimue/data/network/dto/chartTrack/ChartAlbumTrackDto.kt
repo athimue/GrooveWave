@@ -21,4 +21,6 @@ fun ChartAlbumTrackDto.toAlbum() = Album(
     id = id,
     name = title,
     cover = coverXl,
+    genreId = null,
+    nbTracks = null
 )
