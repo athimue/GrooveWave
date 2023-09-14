@@ -16,6 +16,6 @@ abstract class ArtistDao {
     @Query("DELETE FROM artist WHERE id IS :artistId")
     abstract suspend fun delete(artistId: Int): Int
 
-    @Query("SELECT * FROM artist ORDER BY id DESC")
+    @Query("SELECT * FROM artist")
     abstract fun getFavorites(): Flow<List<ArtistEntity>>
 }

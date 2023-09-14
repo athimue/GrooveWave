@@ -79,7 +79,7 @@ fun SearchComposable(
                     trackSelected = it
                     isBottomSheetDisplayed = true
                 },
-                onFavBtnClick = { viewModel.addTrackToFavorite(it) },
+                onFavBtnClick = { viewModel.addFavorite(filterSelected, it) },
                 onTrackClick = onTrackClick
             )
         }

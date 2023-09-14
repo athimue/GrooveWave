@@ -6,14 +6,15 @@ import com.athimue.app.composable.playlist.PlaylistUiModel
 import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
-import com.athimue.domain.repository.PlaylistRepository
 import com.athimue.domain.usecase.SuspendOneInputUseCase
-import com.athimue.domain.usecase.addfavoritetrack.AddFavoriteTrackUseCase
-import com.athimue.domain.usecase.getalbumsearch.GetAlbumSearchUseCase
-import com.athimue.domain.usecase.getartistsearch.GetArtistSearchUseCase
-import com.athimue.domain.usecase.getplaylists.GetPlaylistsUseCase
-import com.athimue.domain.usecase.gettrackinfo.GetTrackInfoUseCase
-import com.athimue.domain.usecase.gettracksearch.GetTrackSearchUseCase
+import com.athimue.domain.usecase.addFavoriteAlbum.AddFavoriteAlbumUseCase
+import com.athimue.domain.usecase.addFavoriteArtist.AddFavoriteArtistUseCase
+import com.athimue.domain.usecase.addFavoriteTrack.AddFavoriteTrackUseCase
+import com.athimue.domain.usecase.addPlaylistTrack.AddPlaylistTrackUseCase
+import com.athimue.domain.usecase.getAlbumSearch.GetAlbumSearchUseCase
+import com.athimue.domain.usecase.getArtistSearch.GetArtistSearchUseCase
+import com.athimue.domain.usecase.getPlaylists.GetPlaylistsUseCase
+import com.athimue.domain.usecase.getTrackSearch.GetTrackSearchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -27,10 +28,11 @@ class SearchViewModel @Inject constructor(
     private val getTrackSearchUseCase: GetTrackSearchUseCase,
     private val getAlbumSearchUseCase: GetAlbumSearchUseCase,
     private val getArtistSearchUseCase: GetArtistSearchUseCase,
-    private val getTrackInfoUseCase: GetTrackInfoUseCase,
     private val getPlaylistsUseCase: GetPlaylistsUseCase,
-    private val playlistRepository: PlaylistRepository,
-    private val addFavoriteTrackUseCase: AddFavoriteTrackUseCase
+    private val addPlaylistTrackUseCase: AddPlaylistTrackUseCase,
+    private val addFavoriteTrackUseCase: AddFavoriteTrackUseCase,
+    private val addFavoriteArtistUseCase: AddFavoriteArtistUseCase,
+    private val addFavoriteAlbumUseCase: AddFavoriteAlbumUseCase,
 ) : ViewModel() {
 
     var uiState: MutableStateFlow<SearchUiState> =
@@ -84,19 +86,22 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-
-    fun addTrackToFavorite(trackId: Long) {
+    fun addTrackToPlaylist(playlistId: Int, trackId: Long) {
         viewModelScope.launch {
-            addFavoriteTrackUseCase.invoke(trackId)
+            addPlaylistTrackUseCase.invoke(
+                firstInput = playlistId,
+                secondInput = trackId
+            )
         }
     }
 
-    fun addTrackToPlaylist(playlistId: Int, trackId: Long) {
+    fun addFavorite(filterSelected: String, id: Long) {
         viewModelScope.launch {
-            playlistRepository.addTrack(
-                playlistId = playlistId,
-                trackId = trackId
-            )
+            when (filterSelected) {
+                "Track" -> addFavoriteTrackUseCase.invoke(id)
+                "Album" -> addFavoriteAlbumUseCase.invoke(id)
+                "Artist" -> addFavoriteArtistUseCase.invoke(id)
+            }
         }
     }
 
@@ -129,7 +134,7 @@ class SearchViewModel @Inject constructor(
     private fun Artist.toSearchResultModel(): SearchResultModel = SearchResultModel(
         id = id,
         title = name,
-        subTitle = link,
+        subTitle = id.toString(),
         picture = cover,
     )
 }
