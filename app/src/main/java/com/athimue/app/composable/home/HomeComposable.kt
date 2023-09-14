@@ -30,13 +30,17 @@ import com.athimue.app.composable.common.TitleText
 fun HomeComposable(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onTrackClick: (Long) -> Unit
+    onPopularTrackClick: (Long) -> Unit,
+    onPopularAlbumClick: (Long) -> Unit,
+    onPopularArtistClick: (Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     HomeComposableContent(
         uiState = uiState,
         modifier = modifier,
-        onTrackClick = onTrackClick
+        onPopularTrackClick = onPopularTrackClick,
+        onPopularAlbumClick = onPopularAlbumClick,
+        onPopularArtistClick = onPopularArtistClick
     )
 }
 
@@ -44,7 +48,9 @@ fun HomeComposable(
 fun HomeComposableContent(
     uiState: HomeUiState,
     modifier: Modifier = Modifier,
-    onTrackClick: (Long) -> Unit
+    onPopularTrackClick: (Long) -> Unit,
+    onPopularAlbumClick: (Long) -> Unit,
+    onPopularArtistClick: (Long) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -63,13 +69,28 @@ fun HomeComposableContent(
                 .fillMaxWidth()
         ) {
             uiState.tracks?.let {
-                HomeLazyRow(R.string.popular_tracks, R.string.no_popular_tracks, it, onTrackClick)
+                HomeLazyRow(
+                    R.string.popular_tracks,
+                    R.string.no_popular_tracks,
+                    it,
+                    onPopularTrackClick
+                )
             }
             uiState.albums?.let {
-                HomeLazyRow(R.string.popular_albums, R.string.no_popular_albums, it, onTrackClick)
+                HomeLazyRow(
+                    R.string.popular_albums,
+                    R.string.no_popular_albums,
+                    it,
+                    onPopularAlbumClick
+                )
             }
             uiState.artists?.let {
-                HomeLazyRow(R.string.popular_artists, R.string.no_popular_artists, it, onTrackClick)
+                HomeLazyRow(
+                    R.string.popular_artists,
+                    R.string.no_popular_artists,
+                    it,
+                    onPopularArtistClick
+                )
             }
         }
     }

@@ -11,7 +11,11 @@ interface SearchRepository {
 
     suspend fun getTracks(query: String): Flow<Result<List<Track>>>
 
+    suspend fun getAlbum(id: Long): Flow<Result<Album>>
+
     suspend fun getAlbums(query: String): Flow<Result<List<Album>>>
+
+    suspend fun getArtist(id: Long): Flow<Result<Artist>>
 
     suspend fun getArtists(query: String): Flow<Result<List<Artist>>>
 

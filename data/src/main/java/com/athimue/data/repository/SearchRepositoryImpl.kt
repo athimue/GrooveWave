@@ -1,6 +1,8 @@
 package com.athimue.data.repository
 
 import com.athimue.data.network.api.DeezerApi
+import com.athimue.data.network.dto.album.toAlbum
+import com.athimue.data.network.dto.artist.toArtist
 import com.athimue.data.network.dto.chartAlbum.ChartAlbumDto
 import com.athimue.data.network.dto.chartAlbum.toAlbum
 import com.athimue.data.network.dto.chartArtist.ChartArtistDto
@@ -46,12 +48,38 @@ class SearchRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAlbum(id: Long): Flow<Result<Album>> {
+        return flow {
+            runCatching {
+                val response = deezerApi.getAlbum(id)
+                response.takeIf { it.isSuccessful }?.body()?.let {
+                    emit(Result.success(it.toAlbum()))
+                } ?: emit(Result.failure(Throwable("No data")))
+            }.getOrElse {
+                emit(Result.failure(Throwable(it.toString())))
+            }
+        }
+    }
+
     override suspend fun getAlbums(query: String): Flow<Result<List<Album>>> {
         return flow {
             runCatching {
                 val response = deezerApi.getSearchedAlbums(query)
                 response.takeIf { it.isSuccessful }?.body()?.let {
                     emit(Result.success(it.data.map(ChartAlbumDto::toAlbum)))
+                } ?: emit(Result.failure(Throwable("No data")))
+            }.getOrElse {
+                emit(Result.failure(Throwable(it.toString())))
+            }
+        }
+    }
+
+    override suspend fun getArtist(id: Long): Flow<Result<Artist>> {
+        return flow {
+            runCatching {
+                val response = deezerApi.getArtist(id)
+                response.takeIf { it.isSuccessful }?.body()?.let {
+                    emit(Result.success(it.toArtist()))
                 } ?: emit(Result.failure(Throwable("No data")))
             }.getOrElse {
                 emit(Result.failure(Throwable(it.toString())))

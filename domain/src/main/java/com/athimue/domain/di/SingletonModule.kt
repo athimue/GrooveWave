@@ -10,7 +10,11 @@ import com.athimue.domain.usecase.addPlaylistTrack.AddPlaylistTrackUseCaseImpl
 import com.athimue.domain.usecase.deletePlaylist.DeletePlaylistUseCase
 import com.athimue.domain.usecase.deletePlaylist.DeletePlaylistUseCaseImpl
 import com.athimue.domain.usecase.deletePlaylistTrack.*
+import com.athimue.domain.usecase.getAlbumInfo.GetAlbumInfoUseCase
+import com.athimue.domain.usecase.getAlbumInfo.GetAlbumInfoUseCaseImpl
 import com.athimue.domain.usecase.getAlbumSearch.*
+import com.athimue.domain.usecase.getArtistInfo.GetArtistInfoUseCase
+import com.athimue.domain.usecase.getArtistInfo.GetArtistInfoUseCaseImpl
 import com.athimue.domain.usecase.getArtistSearch.*
 import com.athimue.domain.usecase.getFavoriteAlbums.*
 import com.athimue.domain.usecase.getFavoriteArtists.*
@@ -88,4 +92,9 @@ abstract class SingletonModule {
     @Binds
     abstract fun provideAddFavoriteArtistUseCase(addFavoriteArtistUseCase: AddFavoriteArtistUseCaseImpl): AddFavoriteArtistUseCase
 
+    @Binds
+    abstract fun provideGetAlbumInfoUseCase(getAlbumInfoUseCase: GetAlbumInfoUseCaseImpl): GetAlbumInfoUseCase
+
+    @Binds
+    abstract fun provideGetArtistInfoUseCase(getArtistInfoUseCase: GetArtistInfoUseCaseImpl): GetArtistInfoUseCase
 }
