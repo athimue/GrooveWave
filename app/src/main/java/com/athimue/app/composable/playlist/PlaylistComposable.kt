@@ -2,7 +2,6 @@ package com.athimue.app.composable.playlist
 
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -101,7 +100,6 @@ private fun PlaylistTracksLazyColumn(
     playlistId: Int,
     onSwipeToDismiss: (Long, Int) -> Unit,
 ) {
-    Log.d("COUCOU", tracks.toString())
     LazyColumn(
         modifier = Modifier.padding(start = 10.dp, top = 5.dp)
     ) {

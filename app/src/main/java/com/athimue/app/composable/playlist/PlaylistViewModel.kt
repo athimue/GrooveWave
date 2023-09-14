@@ -2,8 +2,8 @@ package com.athimue.app.composable.playlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.athimue.domain.usecase.deleteplaylisttrack.DeletePlaylistTrackUseCase
-import com.athimue.domain.usecase.getplaylistinfo.GetPlaylistInfoUseCase
+import com.athimue.domain.usecase.deletePlaylistTrack.DeletePlaylistTrackUseCase
+import com.athimue.domain.usecase.getPlaylistInfo.GetPlaylistInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

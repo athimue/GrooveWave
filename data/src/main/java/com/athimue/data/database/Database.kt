@@ -2,8 +2,6 @@ package com.athimue.data.database
 
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.athimue.data.database.converter.AlbumConverter
-import com.athimue.data.database.converter.ArtistConverter
 import com.athimue.data.database.converter.TrackListConverter
 import com.athimue.data.database.dao.AlbumDao
 import com.athimue.data.database.dao.ArtistDao
@@ -22,7 +20,7 @@ import com.athimue.data.database.entity.TrackEntity
     version = 1,
     exportSchema = false
 )
-@TypeConverters(AlbumConverter::class, ArtistConverter::class, TrackListConverter::class)
+@TypeConverters(TrackListConverter::class)
 abstract class Database : RoomDatabase() {
 
     abstract fun albumDao(): AlbumDao

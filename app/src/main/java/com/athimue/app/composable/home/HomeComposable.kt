@@ -137,10 +137,7 @@ fun LazyRowItem(
         Text(
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Light,
-            text = item.title.substring(
-                0,
-                if (item.title.lastIndex > 10) 10 else item.title.lastIndex
-            ),
+            text = if (item.title.length > 10) item.title.substring(0, 8) + ".." else item.title
         )
     }
     Spacer(modifier = Modifier.size(10.dp))

@@ -2,7 +2,7 @@ package com.athimue.app.composable.track
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.athimue.domain.usecase.gettrackinfo.GetTrackInfoUseCase
+import com.athimue.domain.usecase.getTrackInfo.GetTrackInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

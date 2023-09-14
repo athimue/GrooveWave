@@ -8,5 +8,4 @@ interface FavoriteTracksRepository {
     suspend fun addFavorite(trackId: Long)
 
     suspend fun getFavorites(): Flow<List<Track>>
-
 }

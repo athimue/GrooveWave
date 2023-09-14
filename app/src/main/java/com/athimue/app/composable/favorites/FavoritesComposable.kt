@@ -51,7 +51,7 @@ private fun FavoriteLazyColumn(
             items = when (tabSelected) {
                 0 -> uiState.favoriteTracks
                 1 -> uiState.favoriteArtists
-                2 -> uiState.favoriteAlbum
+                2 -> uiState.favoriteAlbums
                 else -> uiState.favoriteTracks
             }
         ) {
