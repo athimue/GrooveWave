@@ -1,5 +1,5 @@
 # GrooveWave
-GrooveWave is a deezer like application. Build with android jetpack compose based on MVVM and clean architecture.
+GrooveWave is a deezer like application. Build with android jetpack compose based on MVVM and clean architecture (layer based module)
 I developed this application to discover jetpack compose and to improve my mobile skills.
 
 ## Project technical stack
