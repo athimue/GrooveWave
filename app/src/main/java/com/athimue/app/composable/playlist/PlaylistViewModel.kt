@@ -1,5 +1,7 @@
 package com.athimue.app.composable.playlist
 
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.athimue.domain.usecase.deletePlaylistTrack.DeletePlaylistTrackUseCase
@@ -16,6 +18,14 @@ class PlaylistViewModel @Inject constructor(
 ) : ViewModel() {
 
     var uiState = MutableStateFlow(PlaylistUiState())
+    private val mediaPlayer = MediaPlayer().also {
+        it.setAudioAttributes(
+            AudioAttributes
+                .Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build()
+        )
+    }
 
     fun loadPlaylist(playlistId: Int) {
         viewModelScope.launch {
@@ -36,5 +46,12 @@ class PlaylistViewModel @Inject constructor(
         viewModelScope.launch {
             deletePlaylistTrackUseCase.invoke(playlistId, trackId)
         }
+    }
+
+    fun playTrack(trackUrl: String) {
+        mediaPlayer.reset()
+        mediaPlayer.setDataSource(trackUrl)
+        mediaPlayer.prepare()
+        mediaPlayer.start()
     }
 }
