@@ -19,6 +19,9 @@ class FavoriteArtistsRepositoryImpl @Inject constructor(
         favoriteDao.insert(ArtistEntity(artistId))
     }
 
+    override suspend fun deleteFavorite(artistId: Long) =
+        favoriteDao.delete(artistId)
+
     override suspend fun getFavoriteArtists(): Flow<List<Artist>> =
         favoriteDao.getFavorites().map { artistEntities ->
             artistEntities.mapNotNull { artistEntity ->

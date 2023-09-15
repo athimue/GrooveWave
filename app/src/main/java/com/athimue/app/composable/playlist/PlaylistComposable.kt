@@ -1,7 +1,5 @@
 package com.athimue.app.composable.playlist
 
-import android.media.AudioAttributes
-import android.media.MediaPlayer
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -47,8 +45,9 @@ fun PlaylistComposable(
     playlistId: Int,
     onBack: () -> Unit,
 ) {
-    viewModel.loadPlaylist(playlistId)
     val uiState = viewModel.uiState.collectAsState()
+    viewModel.loadPlaylist(playlistId)
+
     Column {
         uiState.value.playlist?.let {
             Column(
@@ -85,7 +84,8 @@ fun PlaylistComposable(
                                 trackId = trackId,
                                 playlistId = playListId
                             )
-                        }
+                        },
+                        onPlayClick = { viewModel.playTrack(it) }
                     )
                 } else
                     NoTrackText()
@@ -99,6 +99,7 @@ private fun PlaylistTracksLazyColumn(
     tracks: List<Track>,
     playlistId: Int,
     onSwipeToDismiss: (Long, Int) -> Unit,
+    onPlayClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.padding(start = 10.dp, top = 5.dp)
@@ -110,7 +111,8 @@ private fun PlaylistTracksLazyColumn(
                 modifier = Modifier,
                 onSwipeToDismiss = onSwipeToDismiss,
                 track = it,
-                playlistId = playlistId
+                playlistId = playlistId,
+                onPlayClick = onPlayClick
             )
         }
     }
@@ -132,7 +134,8 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
     modifier: Modifier,
     onSwipeToDismiss: (Long, Int) -> Unit,
     track: Track,
-    playlistId: Int
+    playlistId: Int,
+    onPlayClick: (String) -> Unit
 ) {
     val context = LocalContext.current
     val currentItem by rememberUpdatedState(track)
@@ -163,14 +166,16 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
         },
         directions = setOf(DismissDirection.EndToStart),
         dismissContent = {
-            TrackRowItem(track)
+            TrackRowItem(track, onPlayClick)
         }
     )
 }
 
 @Composable
-private fun TrackRowItem(it: Track) {
-    val mediaPlayer = MediaPlayer()
+private fun TrackRowItem(
+    it: Track,
+    onPlayClick: (String) -> Unit
+) {
     Row(
         modifier = Modifier
             .padding(vertical = 5.dp)
@@ -195,21 +200,7 @@ private fun TrackRowItem(it: Track) {
             PrimaryColorText(it.artist.name)
         }
         Button(
-            onClick = {
-                mediaPlayer.setAudioAttributes(
-                    AudioAttributes
-                        .Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .build()
-                )
-                try {
-                    mediaPlayer.setDataSource(it.preview)
-                    mediaPlayer.prepare()
-                    mediaPlayer.start()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            },
+            onClick = { onPlayClick(it.preview) },
             modifier = Modifier.align(CenterVertically),
         ) {
             Image(

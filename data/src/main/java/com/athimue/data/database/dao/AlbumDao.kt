@@ -14,7 +14,7 @@ abstract class AlbumDao {
     abstract suspend fun insert(albumEntity: AlbumEntity): Long
 
     @Query("DELETE FROM album WHERE id IS :albumId")
-    abstract suspend fun delete(albumId: Int): Int
+    abstract suspend fun delete(albumId: Long): Int
 
     @Query("SELECT * FROM album ORDER BY id DESC")
     abstract fun getFavorites(): Flow<List<AlbumEntity>>

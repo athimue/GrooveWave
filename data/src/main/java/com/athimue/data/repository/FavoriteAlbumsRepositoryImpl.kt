@@ -19,6 +19,9 @@ class FavoriteAlbumsRepositoryImpl @Inject constructor(
         albumDao.insert(AlbumEntity(albumId))
     }
 
+    override suspend fun deleteFavorite(albumId: Long) =
+        albumDao.delete(albumId)
+
     override suspend fun getFavoriteAlbums(): Flow<List<Album>> =
         albumDao.getFavorites().map { albumEntities ->
             albumEntities.mapNotNull { albumEntity ->
