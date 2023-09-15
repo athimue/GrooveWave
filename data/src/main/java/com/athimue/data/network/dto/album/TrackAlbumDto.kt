@@ -1,5 +1,6 @@
 package com.athimue.data.network.dto.album
 
+import com.athimue.domain.model.Track
 import com.google.gson.annotations.SerializedName
 
 data class TrackAlbumDto(
@@ -19,4 +20,19 @@ data class TrackAlbumDto(
     @SerializedName("artist") val artist: ArtistTrackAlbumDto,
     @SerializedName("album") val album: AlbumTrackAlbumDto,
     @SerializedName("type") val type: String
+)
+
+fun TrackAlbumDto.toTrack() = Track(
+    id = id.toLong(),
+    title = title,
+    titleShort = title_short,
+    link = link,
+    duration = duration.toInt(),
+    rank = rank.toInt(),
+    explicitLyrics = explicitLyrics,
+    preview = preview,
+    position = null,
+    cover = album.coverXl,
+    artist = artist.toArtist(),
+    album = album.toAlbum()
 )

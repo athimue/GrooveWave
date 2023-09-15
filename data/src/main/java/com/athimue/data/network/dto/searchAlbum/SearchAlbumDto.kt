@@ -2,6 +2,7 @@ package com.athimue.data.network.dto.searchAlbum
 
 import com.athimue.data.network.dto.album.*
 import com.athimue.data.network.dto.chartArtist.ChartArtistDto
+import com.athimue.data.network.dto.chartArtist.toArtist
 import com.athimue.domain.model.Album
 import com.google.gson.annotations.SerializedName
 
@@ -27,7 +28,16 @@ data class SearchAlbumDto(
 fun SearchAlbumDto.toAlbum() = Album(
     id = id,
     name = title,
+    link = link,
     cover = coverXl,
-    genreId = genreId,
-    nbTracks = nbTracks
+    genres = null,
+    label = null,
+    duration = null,
+    nbTracks = nbTracks,
+    nbFans = null,
+    releaseDate = null,
+    available = null,
+    explicitLyrics = explicitLyrics,
+    artist = artist.toArtist(),
+    tracks = null
 )

@@ -135,6 +135,6 @@ class SearchViewModel @Inject constructor(
         id = id,
         title = name,
         subTitle = "Albums : $nbAlbum",
-        picture = cover,
+        picture = cover ?: "",
     )
 }

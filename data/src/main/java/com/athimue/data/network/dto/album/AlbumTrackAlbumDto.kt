@@ -19,7 +19,16 @@ data class AlbumTrackAlbumDto(
 fun AlbumTrackAlbumDto.toAlbum() = Album(
     id = id.toLong(),
     name = title,
+    link = null,
     cover = coverXl,
-    genreId = null,
-    nbTracks = null
+    genres = null,
+    label = null,
+    duration = null,
+    nbTracks = null,
+    nbFans = null,
+    releaseDate = null,
+    available = null,
+    explicitLyrics = null,
+    artist = null,
+    tracks = null
 )
