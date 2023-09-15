@@ -16,6 +16,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.athimue.app.composable.common.BackButton
 import com.athimue.app.composable.common.CoverItem
 import com.athimue.app.composable.common.LoaderItem
+import com.athimue.app.composable.common.PrimaryColorText
 
 @Composable
 fun ArtistComposable(
@@ -40,6 +41,9 @@ fun ArtistComposable(
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center
             )
+            it.link?.let { link -> PrimaryColorText(text = "Link : ${link}") }
+            it.nbAlbum?.let { nbAlbum -> PrimaryColorText(text = "Albums : $nbAlbum") }
+            it.nbFan?.let { nbFan -> PrimaryColorText(text = "Fans : $nbFan") }
         } ?: LoaderItem()
     }
 }
