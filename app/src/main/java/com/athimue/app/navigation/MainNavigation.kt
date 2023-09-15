@@ -1,5 +1,6 @@
 package com.athimue.app.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -30,10 +31,10 @@ sealed class Screen(val route: String) {
     object Search : Screen("search")
     object Library : Screen("library")
     object Favorites : Screen("favorites")
-    object Playlist : Screen("playlist/{playlistId}")
-    object Track : Screen("track/{trackId}")
-    object Album : Screen("album/{albumId}")
-    object Artist : Screen("artist/{artistId}")
+    object Playlist : Screen("playlist/{id}")
+    object Track : Screen("track/{id}")
+    object Album : Screen("album/{id}")
+    object Artist : Screen("artist/{id}")
 }
 
 @Composable
@@ -62,7 +63,7 @@ fun MainNavigation() {
                     onPopularTrackClick = { trackId ->
                         navController.navigate(
                             Screen.Track.route.replace(
-                                oldValue = "{trackId}",
+                                oldValue = "{id}",
                                 newValue = trackId.toString()
                             )
                         )
@@ -70,7 +71,7 @@ fun MainNavigation() {
                     onPopularAlbumClick = { albumId ->
                         navController.navigate(
                             Screen.Album.route.replace(
-                                oldValue = "{albumId}",
+                                oldValue = "{id}",
                                 newValue = albumId.toString()
                             )
                         )
@@ -78,7 +79,7 @@ fun MainNavigation() {
                     onPopularArtistClick = { artistId ->
                         navController.navigate(
                             Screen.Artist.route.replace(
-                                oldValue = "{artistId}",
+                                oldValue = "{id}",
                                 newValue = artistId.toString()
                             )
                         )
@@ -87,13 +88,29 @@ fun MainNavigation() {
             }
             composable(Screen.Search.route) {
                 SearchComposable(
-                    onTrackClick = { trackId ->
-                        navController.navigate(
-                            Screen.Track.route.replace(
-                                oldValue = "{trackId}",
-                                newValue = trackId.toString()
+                    onClick = { filter, id ->
+                        Log.d("COUCOU", "$filter, $id")
+                        when (filter) {
+                            "Track" -> navController.navigate(
+                                Screen.Track.route.replace(
+                                    oldValue = "{id}",
+                                    newValue = id.toString()
+                                )
                             )
-                        )
+                            "Album" -> navController.navigate(
+                                Screen.Album.route.replace(
+                                    oldValue = "{id}",
+                                    newValue = id.toString()
+                                )
+                            )
+                            "Artist" -> navController.navigate(
+                                Screen.Artist.route.replace(
+                                    oldValue = "{id}",
+                                    newValue = id.toString()
+                                )
+                            )
+                        }
+
                     },
                 )
             }
@@ -102,7 +119,7 @@ fun MainNavigation() {
                     onPlaylistClick = { playlistId ->
                         navController.navigate(
                             Screen.Playlist.route.replace(
-                                oldValue = "{playlistId}",
+                                oldValue = "{id}",
                                 newValue = playlistId.toString()
                             )
                         )
@@ -115,50 +132,50 @@ fun MainNavigation() {
             composable(
                 route = Screen.Playlist.route,
                 arguments = listOf(
-                    navArgument("playlistId") {
+                    navArgument("id") {
                         type = NavType.IntType
                         defaultValue = -1
                     })
             ) { playlistId ->
                 PlaylistComposable(
-                    playlistId = playlistId.arguments?.getInt("playlistId") ?: -1,
+                    playlistId = playlistId.arguments?.getInt("id") ?: -1,
                     onBack = { navController.popBackStack() }
                 )
             }
             composable(
                 route = Screen.Track.route,
                 arguments = listOf(
-                    navArgument("trackId") {
+                    navArgument("id") {
                         type = NavType.LongType
                         defaultValue = -1
                     })
             ) { trackId ->
                 TrackComposable(
-                    trackId = trackId.arguments?.getLong("trackId") ?: -1,
+                    trackId = trackId.arguments?.getLong("id") ?: -1,
                     onBack = { navController.popBackStack() })
             }
             composable(
                 route = Screen.Album.route,
                 arguments = listOf(
-                    navArgument("albumId") {
+                    navArgument("id") {
                         type = NavType.LongType
                         defaultValue = -1
                     })
             ) { albumId ->
                 AlbumComposable(
-                    albumId = albumId.arguments?.getLong("albumId") ?: -1,
+                    albumId = albumId.arguments?.getLong("id") ?: -1,
                     onBack = { navController.popBackStack() })
             }
             composable(
                 route = Screen.Artist.route,
                 arguments = listOf(
-                    navArgument("artistId") {
+                    navArgument("id") {
                         type = NavType.LongType
                         defaultValue = -1
                     })
             ) { artistId ->
                 ArtistComposable(
-                    artistId = artistId.arguments?.getLong("artistId") ?: -1,
+                    artistId = artistId.arguments?.getLong("id") ?: -1,
                     onBack = { navController.popBackStack() })
             }
         }

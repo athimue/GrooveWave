@@ -20,7 +20,16 @@ data class ChartAlbumTrackDto(
 fun ChartAlbumTrackDto.toAlbum() = Album(
     id = id,
     name = title,
+    link = link,
     cover = coverXl,
-    genreId = null,
-    nbTracks = null
+    genres = null,
+    label = coverXl,
+    duration = null,
+    nbTracks = null,
+    nbFans = null,
+    releaseDate = null,
+    available = null,
+    explicitLyrics = null,
+    artist = null,
+    tracks = null,
 )

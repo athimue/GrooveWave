@@ -51,5 +51,5 @@ class HomeViewModel @Inject constructor(
         LazyRowItemModel(id, name, cover)
 
     private fun Artist.toLazyRowItemModel(): LazyRowItemModel =
-        LazyRowItemModel(id, name, cover)
+        LazyRowItemModel(id, name, cover ?: "")
 }

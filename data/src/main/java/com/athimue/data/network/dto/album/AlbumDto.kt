@@ -38,7 +38,16 @@ data class AlbumDto(
 fun AlbumDto.toAlbum() = Album(
     id = id.toLong(),
     name = title,
+    link = link,
     cover = coverXl,
-    genreId = genreId,
-    nbTracks = nbTracks
+    genres = genres.data.map(GenreAlbumDto::toGenre),
+    label = label,
+    duration = duration,
+    nbTracks = nbTracks,
+    nbFans = fans,
+    releaseDate = releaseDate,
+    available = available,
+    explicitLyrics = explicitLyrics,
+    artist = artist.toArtist(),
+    tracks = tracks.data.map(TrackAlbumDto::toTrack)
 )

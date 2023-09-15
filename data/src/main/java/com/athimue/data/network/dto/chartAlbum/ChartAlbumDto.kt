@@ -1,6 +1,7 @@
 package com.athimue.data.network.dto.chartAlbum
 
 import com.athimue.data.network.dto.chartArtist.ChartArtistDto
+import com.athimue.data.network.dto.chartArtist.toArtist
 import com.athimue.domain.model.Album
 import com.google.gson.annotations.SerializedName
 
@@ -25,7 +26,16 @@ data class ChartAlbumDto(
 fun ChartAlbumDto.toAlbum() = Album(
     id = id,
     name = title,
+    link = link,
     cover = coverXl,
-    genreId = -1,
-    nbTracks = -1
+    genres = null,
+    label = null,
+    duration = null,
+    nbTracks = null,
+    nbFans = null,
+    releaseDate = null,
+    available = null,
+    explicitLyrics = explicitLyrics,
+    artist = artist.toArtist(),
+    tracks = null
 )

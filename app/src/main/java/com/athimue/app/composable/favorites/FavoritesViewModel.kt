@@ -55,7 +55,7 @@ internal class FavoritesViewModel @Inject constructor(
         id = id,
         title = name,
         subTitle = id.toString(),
-        picture = cover,
+        picture = cover ?: "",
     )
 
     private fun Album.toSearchResultModel(): SearchResultModel = SearchResultModel(
