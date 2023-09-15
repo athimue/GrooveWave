@@ -6,6 +6,9 @@ import com.athimue.app.composable.search.SearchResultModel
 import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
+import com.athimue.domain.usecase.deleteFavoriteAlbum.DeleteFavoriteAlbumUseCase
+import com.athimue.domain.usecase.deleteFavoriteArtist.DeleteFavoriteArtistUseCase
+import com.athimue.domain.usecase.deleteFavoriteTrack.DeleteFavoriteTrackUseCase
 import com.athimue.domain.usecase.getFavoriteAlbums.GetFavoriteAlbumsUseCase
 import com.athimue.domain.usecase.getFavoriteArtists.GetFavoriteArtistsUseCase
 import com.athimue.domain.usecase.getFavoriteTracks.GetFavoriteTracksUseCase
@@ -19,6 +22,9 @@ internal class FavoritesViewModel @Inject constructor(
     private val getFavoriteTracksUseCase: GetFavoriteTracksUseCase,
     private val getFavoriteArtistsUseCase: GetFavoriteArtistsUseCase,
     private val getFavoriteAlbumsUseCase: GetFavoriteAlbumsUseCase,
+    private val deleteFavoriteTrackUseCase: DeleteFavoriteTrackUseCase,
+    private val deleteFavoriteArtistUseCase: DeleteFavoriteArtistUseCase,
+    private val deleteFavoriteAlbumUseCase: DeleteFavoriteAlbumUseCase
 ) : ViewModel() {
 
     var uiState = MutableStateFlow(FavoritesUiState())
@@ -40,6 +46,16 @@ internal class FavoritesViewModel @Inject constructor(
             getFavoriteAlbumsUseCase.invoke().collect {
                 uiState.value =
                     uiState.value.copy(favoriteAlbums = it.map { album -> album.toSearchResultModel() })
+            }
+        }
+    }
+
+    fun removeFavorite(filter: String, id: Long) {
+        viewModelScope.launch {
+            when (filter) {
+                "Tracks" -> deleteFavoriteTrackUseCase.invoke(id)
+                "Artists" -> deleteFavoriteArtistUseCase.invoke(id)
+                "Albums" -> deleteFavoriteAlbumUseCase.invoke(id)
             }
         }
     }

@@ -36,7 +36,8 @@ internal fun FavoritesComposable(viewModel: FavoritesViewModel = hiltViewModel()
         )
         FavoriteLazyColumn(
             tabSelected = tabSelected,
-            uiState = uiState
+            uiState = uiState,
+            removeFavorite = { viewModel.removeFavorite(titles[tabSelected], it) }
         )
     }
 }
@@ -44,7 +45,8 @@ internal fun FavoritesComposable(viewModel: FavoritesViewModel = hiltViewModel()
 @Composable
 private fun FavoriteLazyColumn(
     tabSelected: Int,
-    uiState: FavoritesUiState
+    uiState: FavoritesUiState,
+    removeFavorite: (Long) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(
@@ -55,7 +57,7 @@ private fun FavoriteLazyColumn(
                 else -> uiState.favoriteTracks
             }
         ) {
-            FavoriteRowItem(it)
+            FavoriteRowItem(it, removeFavorite)
         }
     }
 }
@@ -76,7 +78,7 @@ private fun FavoriteTabRow(
 }
 
 @Composable
-private fun FavoriteRowItem(it: SearchResultModel) {
+private fun FavoriteRowItem(it: SearchResultModel, removeFavorite: (Long) -> Unit) {
     Row(
         modifier = Modifier
             .padding(vertical = 5.dp)
@@ -108,7 +110,8 @@ private fun FavoriteRowItem(it: SearchResultModel) {
         }
         Button(
             modifier = Modifier.padding(5.dp),
-            onClick = { }) {
+            onClick = { removeFavorite(it.id) }
+        ) {
             Image(
                 imageVector = Icons.Rounded.Favorite,
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondaryContainer),

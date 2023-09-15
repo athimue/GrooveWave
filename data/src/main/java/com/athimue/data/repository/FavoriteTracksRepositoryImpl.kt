@@ -19,6 +19,10 @@ class FavoriteTracksRepositoryImpl @Inject constructor(
         trackDao.insert(TrackEntity(trackId))
     }
 
+    override suspend fun deleteFavorite(trackId: Long) {
+        trackDao.delete(trackId)
+    }
+
     override suspend fun getFavorites(): Flow<List<Track>> =
         trackDao.getFavorites().map { trackEntities ->
             trackEntities.mapNotNull { trackEntity ->

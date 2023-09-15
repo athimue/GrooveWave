@@ -14,7 +14,7 @@ abstract class ArtistDao {
     abstract suspend fun insert(artistEntity: ArtistEntity): Long
 
     @Query("DELETE FROM artist WHERE id IS :artistId")
-    abstract suspend fun delete(artistId: Int): Int
+    abstract suspend fun delete(artistId: Long)
 
     @Query("SELECT * FROM artist")
     abstract fun getFavorites(): Flow<List<ArtistEntity>>

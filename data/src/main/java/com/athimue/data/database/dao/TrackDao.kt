@@ -14,7 +14,7 @@ abstract class TrackDao {
     abstract suspend fun insert(track: TrackEntity): Long
 
     @Query("DELETE FROM track WHERE id IS :trackId")
-    abstract suspend fun delete(trackId: Int): Int
+    abstract suspend fun delete(trackId: Long): Int
 
     @Query("SELECT * FROM track ORDER BY id DESC")
     abstract fun getFavorites(): Flow<List<TrackEntity>>

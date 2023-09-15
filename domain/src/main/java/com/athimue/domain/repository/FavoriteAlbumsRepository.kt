@@ -7,5 +7,7 @@ interface FavoriteAlbumsRepository {
 
     suspend fun addFavorite(albumId: Long)
 
+    suspend fun deleteFavorite(albumId: Long): Int
+
     suspend fun getFavoriteAlbums(): Flow<List<Album>>
 }
