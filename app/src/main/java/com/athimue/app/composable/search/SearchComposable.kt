@@ -42,6 +42,7 @@ fun SearchComposable(
     onClick: (String, Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     val filters = listOf("Track", "Album", "Artist", "Playlist", "Podcast", "Radio")
     var query by remember { mutableStateOf(TextFieldValue("")) }
     var isBottomSheetDisplayed by remember { mutableStateOf(false) }
@@ -71,7 +72,7 @@ fun SearchComposable(
             )
         } else {
             if (uiState.isLoading) {
-                LoaderItem()
+                LoaderItem(Modifier.fillMaxSize())
             } else SearchGrid(
                 searchResults = uiState.searchResult,
                 isPlaylistBtnDisplayed = filterSelected == "Track",
@@ -79,7 +80,10 @@ fun SearchComposable(
                     trackSelected = it
                     isBottomSheetDisplayed = true
                 },
-                onFavBtnClick = { viewModel.addFavorite(filterSelected, it) },
+                onFavBtnClick = {
+                    Toast.makeText(context, "Song added to Favorites", Toast.LENGTH_SHORT).show()
+                    viewModel.addFavorite(filterSelected, it)
+                },
                 onClick = { onClick(filterSelected, it) },
             )
         }
@@ -88,7 +92,6 @@ fun SearchComposable(
                 onDismissRequest = { isBottomSheetDisplayed = false },
                 sheetState = bottomSheetState
             ) {
-                val context = LocalContext.current
                 Scaffold(
                     floatingActionButtonPosition = FabPosition.Center,
                     floatingActionButton = {

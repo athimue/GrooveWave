@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -78,6 +79,7 @@ fun PlaylistComposable(
                 if (it.tracks.isNotEmpty()) {
                     PlaylistTracksLazyColumn(
                         tracks = it.tracks,
+                        trackPlaying = uiState.value.trackUrlPlayed,
                         playlistId = playlistId,
                         onSwipeToDismiss = { trackId, playListId ->
                             viewModel.deletePlaylistTrack(
@@ -90,7 +92,7 @@ fun PlaylistComposable(
                 } else
                     NoTrackText()
             }
-        } ?: LoaderItem()
+        } ?: LoaderItem(Modifier.fillMaxSize())
     }
 }
 
@@ -98,6 +100,7 @@ fun PlaylistComposable(
 private fun PlaylistTracksLazyColumn(
     tracks: List<Track>,
     playlistId: Int,
+    trackPlaying: String?,
     onSwipeToDismiss: (Long, Int) -> Unit,
     onPlayClick: (String) -> Unit
 ) {
@@ -111,6 +114,7 @@ private fun PlaylistTracksLazyColumn(
                 modifier = Modifier,
                 onSwipeToDismiss = onSwipeToDismiss,
                 track = it,
+                trackPlaying = trackPlaying,
                 playlistId = playlistId,
                 onPlayClick = onPlayClick
             )
@@ -134,6 +138,7 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
     modifier: Modifier,
     onSwipeToDismiss: (Long, Int) -> Unit,
     track: Track,
+    trackPlaying: String?,
     playlistId: Int,
     onPlayClick: (String) -> Unit
 ) {
@@ -166,7 +171,7 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
         },
         directions = setOf(DismissDirection.EndToStart),
         dismissContent = {
-            TrackRowItem(track, onPlayClick)
+            TrackRowItem(track, trackPlaying, onPlayClick)
         }
     )
 }
@@ -174,6 +179,7 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
 @Composable
 private fun TrackRowItem(
     it: Track,
+    trackPlaying: String?,
     onPlayClick: (String) -> Unit
 ) {
     Row(
@@ -204,7 +210,7 @@ private fun TrackRowItem(
             modifier = Modifier.align(CenterVertically),
         ) {
             Image(
-                imageVector = Icons.Rounded.PlayArrow,
+                imageVector = if (it.preview == trackPlaying) Icons.Rounded.Refresh else Icons.Rounded.PlayArrow,
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
                 contentDescription = "",
             )

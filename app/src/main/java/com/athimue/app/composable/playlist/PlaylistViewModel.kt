@@ -18,6 +18,7 @@ class PlaylistViewModel @Inject constructor(
 ) : ViewModel() {
 
     var uiState = MutableStateFlow(PlaylistUiState())
+
     private val mediaPlayer = MediaPlayer().also {
         it.setAudioAttributes(
             AudioAttributes
@@ -25,6 +26,9 @@ class PlaylistViewModel @Inject constructor(
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                 .build()
         )
+        it.setOnCompletionListener {
+            uiState.value = uiState.value.copy(trackUrlPlayed = null)
+        }
     }
 
     fun loadPlaylist(playlistId: Int) {
@@ -49,6 +53,9 @@ class PlaylistViewModel @Inject constructor(
     }
 
     fun playTrack(trackUrl: String) {
+        uiState.value = uiState.value.copy(
+            trackUrlPlayed = trackUrl
+        )
         mediaPlayer.reset()
         mediaPlayer.setDataSource(trackUrl)
         mediaPlayer.prepare()
