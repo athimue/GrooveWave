@@ -1,5 +1,6 @@
 package com.athimue.app.composable.favorites
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,6 +25,7 @@ import com.athimue.app.composable.search.SearchResultModel
 @Composable
 internal fun FavoritesComposable(viewModel: FavoritesViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     val titles = listOf("Tracks", "Artists", "Albums")
     var tabSelected by remember { mutableStateOf(0) }
     Column {
@@ -37,7 +40,14 @@ internal fun FavoritesComposable(viewModel: FavoritesViewModel = hiltViewModel()
         FavoriteLazyColumn(
             tabSelected = tabSelected,
             uiState = uiState,
-            removeFavorite = { viewModel.removeFavorite(titles[tabSelected], it) }
+            removeFavorite = {
+                Toast.makeText(
+                    context,
+                    "Item removed from Favorites",
+                    Toast.LENGTH_SHORT
+                ).show()
+                viewModel.removeFavorite(titles[tabSelected], it)
+            }
         )
     }
 }
