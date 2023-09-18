@@ -71,7 +71,7 @@ fun SearchComposable(
             )
         } else {
             if (uiState.isLoading) {
-                LoaderItem()
+                LoaderItem(Modifier.fillMaxSize())
             } else SearchGrid(
                 searchResults = uiState.searchResult,
                 isPlaylistBtnDisplayed = filterSelected == "Track",

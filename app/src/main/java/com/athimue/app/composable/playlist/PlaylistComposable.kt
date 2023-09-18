@@ -90,7 +90,7 @@ fun PlaylistComposable(
                 } else
                     NoTrackText()
             }
-        } ?: LoaderItem()
+        } ?: LoaderItem(Modifier.fillMaxSize())
     }
 }
 

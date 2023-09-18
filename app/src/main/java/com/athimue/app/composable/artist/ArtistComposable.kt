@@ -1,6 +1,7 @@
 package com.athimue.app.composable.artist
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,6 @@ fun ArtistComposable(
             it.link?.let { link -> PrimaryColorText(text = "Link : ${link}") }
             it.nbAlbum?.let { nbAlbum -> PrimaryColorText(text = "Albums : $nbAlbum") }
             it.nbFan?.let { nbFan -> PrimaryColorText(text = "Fans : $nbFan") }
-        } ?: LoaderItem()
+        } ?: LoaderItem(Modifier.fillMaxSize())
     }
 }

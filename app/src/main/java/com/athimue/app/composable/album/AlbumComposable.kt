@@ -69,7 +69,7 @@ fun AlbumComposable(
                     lineSpacing = 4.dp,
                 )
             }
-        } ?: LoaderItem()
+        } ?: LoaderItem(Modifier.fillMaxSize())
     }
 }
 

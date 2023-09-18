@@ -88,6 +88,6 @@ fun TrackComposable(
                     Text(text = it.artist.id.toString())
                 }
             }
-        } ?: LoaderItem()
+        } ?: LoaderItem(Modifier.fillMaxSize())
     }
 }

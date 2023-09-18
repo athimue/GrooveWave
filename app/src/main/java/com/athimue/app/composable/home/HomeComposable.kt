@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.athimue.app.R
+import com.athimue.app.composable.common.LoaderItem
 import com.athimue.app.composable.common.TitleText
 
 @Composable
@@ -68,30 +69,24 @@ fun HomeComposableContent(
             modifier = modifier
                 .fillMaxWidth()
         ) {
-            uiState.tracks?.let {
-                HomeLazyRow(
-                    R.string.popular_tracks,
-                    R.string.no_popular_tracks,
-                    it,
-                    onPopularTrackClick
-                )
-            }
-            uiState.albums?.let {
-                HomeLazyRow(
-                    R.string.popular_albums,
-                    R.string.no_popular_albums,
-                    it,
-                    onPopularAlbumClick
-                )
-            }
-            uiState.artists?.let {
-                HomeLazyRow(
-                    R.string.popular_artists,
-                    R.string.no_popular_artists,
-                    it,
-                    onPopularArtistClick
-                )
-            }
+            HomeLazyRow(
+                R.string.popular_tracks,
+                R.string.no_popular_tracks,
+                uiState.tracks,
+                onPopularTrackClick
+            )
+            HomeLazyRow(
+                R.string.popular_albums,
+                R.string.no_popular_albums,
+                uiState.albums,
+                onPopularAlbumClick
+            )
+            HomeLazyRow(
+                R.string.popular_artists,
+                R.string.no_popular_artists,
+                uiState.artists,
+                onPopularArtistClick
+            )
         }
     }
 }
@@ -100,26 +95,28 @@ fun HomeComposableContent(
 fun ColumnScope.HomeLazyRow(
     titleId: Int,
     errorTitle: Int,
-    items: List<LazyRowItemModel>,
+    items: List<LazyRowItemModel>?,
     onTrackClick: (Long) -> Unit
 ) {
     TitleText(stringResource(id = titleId))
-    if (items.isEmpty()) {
-        ErrorTitle(stringResource(id = errorTitle))
-    } else {
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-        ) {
-            items(items) { item ->
-                LazyRowItem(
-                    item = item,
-                    onTrackClick = onTrackClick
-                )
+    items?.let {
+        if (items.isEmpty()) {
+            ErrorTitle(stringResource(id = errorTitle))
+        } else {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            ) {
+                items(it) { item ->
+                    LazyRowItem(
+                        item = item,
+                        onTrackClick = onTrackClick
+                    )
+                }
             }
         }
-    }
+    } ?: LoaderItem(Modifier.fillMaxWidth())
 }
 
 @Composable
