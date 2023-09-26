@@ -42,9 +42,9 @@ fun ArtistComposable(
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center
             )
-            it.link?.let { link -> PrimaryColorText(text = "Link : ${link}") }
-            it.nbAlbum?.let { nbAlbum -> PrimaryColorText(text = "Albums : $nbAlbum") }
-            it.nbFan?.let { nbFan -> PrimaryColorText(text = "Fans : $nbFan") }
+            PrimaryColorText(text = "Link : ${it.link}")
+            PrimaryColorText(text = "Albums : ${it.nbAlbum}")
+            PrimaryColorText(text = "Fans : ${it.nbFan}")
         } ?: LoaderItem(Modifier.fillMaxSize())
     }
 }
