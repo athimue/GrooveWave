@@ -3,6 +3,7 @@ package com.athimue.app.composable.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.athimue.app.composable.playlist.PlaylistUiModel
+import com.athimue.app.composable.playlist.toTrackUiModel
 import com.athimue.domain.model.Album
 import com.athimue.domain.model.Artist
 import com.athimue.domain.model.Track
@@ -47,7 +48,7 @@ class SearchViewModel @Inject constructor(
                     PlaylistUiModel(
                         id = playlist.id,
                         name = playlist.name,
-                        tracks = playlist.tracks
+                        trackUiModels = playlist.tracks.map { track -> track.toTrackUiModel() }
                     )
                 })
             }

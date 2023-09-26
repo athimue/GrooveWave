@@ -44,31 +44,26 @@ fun AlbumComposable(
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center
             )
-            it.artist?.let { artist -> PrimaryColorText(text = "Artist : ${artist.name}") }
-            it.releaseDate?.let { releaseDate -> PrimaryColorText(text = "Release date : $releaseDate") }
-            it.duration?.let { duration -> PrimaryColorText(text = "Duration : $duration") }
+            PrimaryColorText(text = "Artist : ${it.artistName}")
+            PrimaryColorText(text = "Release date : ${it.releaseDate}")
+            PrimaryColorText(text = "Duration : ${it.duration}")
             PrimaryColorText(text = "Tracks : ${it.nbTracks}")
-            it.label?.let { label -> PrimaryColorText(text = "Label : $label") }
+            PrimaryColorText(text = "Label : ${it.label}")
             PrimaryColorText(text = "Fans : ${it.nbFans}")
-            it.explicitLyrics?.let { explicitLyrics -> PrimaryColorText(text = "Explicit lyrics ? : $explicitLyrics") }
-            it.available?.let { available -> PrimaryColorText(text = "Available ? : $available") }
-            it.genres?.let { genres ->
-                PrimaryColorText(text = "Genres :")
-                BulletList(
-                    items = genres.map { it.name },
-                    modifier = Modifier.padding(8.dp),
-                    lineSpacing = 4.dp,
-                )
-            }
-
-            it.tracks?.let { tracks ->
-                PrimaryColorText(text = "Tracks :")
-                BulletList(
-                    items = tracks.map { it.title },
-                    modifier = Modifier.padding(8.dp),
-                    lineSpacing = 4.dp,
-                )
-            }
+            PrimaryColorText(text = "Explicit lyrics ? : ${it.explicitLyrics}")
+            PrimaryColorText(text = "Available ? : ${it.available}")
+            PrimaryColorText(text = "Genres :")
+            BulletList(
+                items = it.genreNames,
+                modifier = Modifier.padding(8.dp),
+                lineSpacing = 4.dp,
+            )
+            PrimaryColorText(text = "Tracks :")
+            BulletList(
+                items = it.trackNames,
+                modifier = Modifier.padding(8.dp),
+                lineSpacing = 4.dp,
+            )
         } ?: LoaderItem(Modifier.fillMaxSize())
     }
 }

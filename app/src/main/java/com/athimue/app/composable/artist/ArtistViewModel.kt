@@ -21,7 +21,9 @@ class ArtistViewModel @Inject constructor(
         viewModelScope.launch {
             getArtistInfoUseCase.invoke(artistId).collect {
                 it.getOrNull()
-                    ?.let { artist -> uiState.value = uiState.value.copy(artist = artist) }
+                    ?.let { artist ->
+                        uiState.value = uiState.value.copy(artist = artist.toArtistUiModel())
+                    }
             }
         }
     }

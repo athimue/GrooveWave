@@ -13,13 +13,14 @@ class AlbumViewModel @Inject constructor(
     private val getAlbumInfoUseCase: GetAlbumInfoUseCase
 ) : ViewModel() {
 
-    var uiState: MutableStateFlow<AlbumUiState> =
-        MutableStateFlow(AlbumUiState())
+    var uiState = MutableStateFlow(AlbumUiState())
 
     fun loadAlbum(albumId: Long) {
         viewModelScope.launch {
             getAlbumInfoUseCase.invoke(albumId).collect {
-                it.getOrNull()?.let { album -> uiState.value = uiState.value.copy(album = album) }
+                it.getOrNull()?.let { album ->
+                    uiState.value = uiState.value.copy(album = album.toAlbumUiModel())
+                }
             }
         }
     }
