@@ -2,7 +2,6 @@ package com.athimue.app.composable.library
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.athimue.domain.repository.PlaylistRepository
 import com.athimue.domain.usecase.addPlaylist.AddPlaylistUseCase
 import com.athimue.domain.usecase.deletePlaylist.DeletePlaylistUseCase
 import com.athimue.domain.usecase.getPlaylists.GetPlaylistsUseCase
@@ -23,7 +22,7 @@ class LibraryViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getPlaylistsUseCase.invoke().collect {
-                uiState.value = uiState.value.copy(playlists = it)
+                uiState.value = uiState.value.copy(playlists = it.map { it.toLibraryUiModel() })
             }
         }
     }

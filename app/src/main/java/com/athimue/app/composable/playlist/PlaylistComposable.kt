@@ -38,7 +38,6 @@ import com.athimue.app.composable.common.BackButton
 import com.athimue.app.composable.common.CoverItem
 import com.athimue.app.composable.common.LoaderItem
 import com.athimue.app.composable.common.PrimaryColorText
-import com.athimue.domain.model.Track
 
 @Composable
 fun PlaylistComposable(
@@ -60,8 +59,8 @@ fun PlaylistComposable(
             ) {
                 BackButton(onBack)
                 CoverItem(
-                    painter = if (it.tracks.isNotEmpty())
-                        rememberAsyncImagePainter(it.tracks[0].cover)
+                    painter = if (it.trackUiModels.isNotEmpty())
+                        rememberAsyncImagePainter(it.trackUiModels[0].cover)
                     else {
                         painterResource(id = R.drawable.playlist_cover)
                     }
@@ -70,15 +69,15 @@ fun PlaylistComposable(
                     text = it.name
                 )
                 PlaylistItemText(
-                    text = if (it.tracks.isNotEmpty()) {
+                    text = if (it.trackUiModels.isNotEmpty()) {
                         "${
-                            it.tracks.map { it.duration }.reduce { acc, dur -> acc + dur }
+                            it.trackUiModels.map { it.duration }.reduce { acc, dur -> acc + dur }
                         } sec"
                     } else "0 sec")
                 Divider(modifier = Modifier.padding(start = 10.dp, top = 5.dp))
-                if (it.tracks.isNotEmpty()) {
+                if (it.trackUiModels.isNotEmpty()) {
                     PlaylistTracksLazyColumn(
-                        tracks = it.tracks,
+                        trackUiModels = it.trackUiModels,
                         trackPlaying = uiState.value.trackUrlPlayed,
                         playlistId = playlistId,
                         onSwipeToDismiss = { trackId, playListId ->
@@ -98,7 +97,7 @@ fun PlaylistComposable(
 
 @Composable
 private fun PlaylistTracksLazyColumn(
-    tracks: List<Track>,
+    trackUiModels: List<TrackUiModel>,
     playlistId: Int,
     trackPlaying: String?,
     onSwipeToDismiss: (Long, Int) -> Unit,
@@ -107,13 +106,13 @@ private fun PlaylistTracksLazyColumn(
     LazyColumn(
         modifier = Modifier.padding(start = 10.dp, top = 5.dp)
     ) {
-        items(items = tracks,
+        items(items = trackUiModels,
             key = { item -> item.id }
         ) {
             PlaylistSwipeToDismissItem(
                 modifier = Modifier,
                 onSwipeToDismiss = onSwipeToDismiss,
-                track = it,
+                trackUiModel = it,
                 trackPlaying = trackPlaying,
                 playlistId = playlistId,
                 onPlayClick = onPlayClick
@@ -137,13 +136,13 @@ private fun PlaylistItemText(text: String) {
 private fun LazyItemScope.PlaylistSwipeToDismissItem(
     modifier: Modifier,
     onSwipeToDismiss: (Long, Int) -> Unit,
-    track: Track,
+    trackUiModel: TrackUiModel,
     trackPlaying: String?,
     playlistId: Int,
     onPlayClick: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val currentItem by rememberUpdatedState(track)
+    val currentItem by rememberUpdatedState(trackUiModel)
     val dismissState = rememberDismissState(
         confirmValueChange = { dismissValue ->
             when (dismissValue) {
@@ -171,14 +170,14 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
         },
         directions = setOf(DismissDirection.EndToStart),
         dismissContent = {
-            TrackRowItem(track, trackPlaying, onPlayClick)
+            TrackRowItem(trackUiModel, trackPlaying, onPlayClick)
         }
     )
 }
 
 @Composable
 private fun TrackRowItem(
-    it: Track,
+    trackUiModel: TrackUiModel,
     trackPlaying: String?,
     onPlayClick: (String) -> Unit
 ) {
@@ -188,7 +187,7 @@ private fun TrackRowItem(
             .padding(horizontal = 5.dp)
     ) {
         Image(
-            painter = rememberAsyncImagePainter(it.cover),
+            painter = rememberAsyncImagePainter(trackUiModel.cover),
             contentDescription = "",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -201,16 +200,16 @@ private fun TrackRowItem(
                 .padding(start = 10.dp)
                 .weight(1f)
         ) {
-            PrimaryColorText(it.title)
-            PrimaryColorText(it.album.name)
-            PrimaryColorText(it.artist.name)
+            PrimaryColorText(trackUiModel.title)
+            PrimaryColorText(trackUiModel.albumName)
+            PrimaryColorText(trackUiModel.artistName)
         }
         Button(
-            onClick = { onPlayClick(it.preview) },
+            onClick = { onPlayClick(trackUiModel.preview) },
             modifier = Modifier.align(CenterVertically),
         ) {
             Image(
-                imageVector = if (it.preview == trackPlaying) Icons.Rounded.Refresh else Icons.Rounded.PlayArrow,
+                imageVector = if (trackUiModel.preview == trackPlaying) Icons.Rounded.Refresh else Icons.Rounded.PlayArrow,
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
                 contentDescription = "",
             )

@@ -138,8 +138,8 @@ fun SearchComposable(
                                     modifier = Modifier.clickable { playlistSelected = it.id }
                                 ) {
                                     Image(
-                                        painter = if (it.tracks.isNotEmpty()) rememberAsyncImagePainter(
-                                            it.tracks[0].cover
+                                        painter = if (it.trackUiModels.isNotEmpty()) rememberAsyncImagePainter(
+                                            it.trackUiModels[0].cover
                                         )
                                         else {
                                             painterResource(id = R.drawable.playlist_cover)
@@ -159,7 +159,7 @@ fun SearchComposable(
                                             .align(Alignment.CenterVertically),
                                     ) {
                                         Text(text = it.name)
-                                        Text(text = "${it.tracks.size} songs")
+                                        Text(text = "${it.trackUiModels.size} songs")
                                     }
                                     RadioButton(
                                         modifier = Modifier.align(Alignment.CenterVertically),

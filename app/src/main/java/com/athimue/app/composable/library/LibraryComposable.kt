@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.athimue.app.R
 import com.athimue.app.composable.common.TitleText
-import com.athimue.domain.model.Playlist
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +61,7 @@ fun LibraryComposable(
                     items = uiState.playlists,
                     key = { item -> item.id }) {
                     LibrarySwipeToDismiss(
-                        playlist = it,
+                        libraryUiModel = it,
                         onPlaylistClick = onPlaylistClick,
                         onEditPlaylist = onEditPlaylist,
                         onDeletePlaylist = { playlistId -> viewModel.deletePlaylist(playlistId) }
@@ -108,13 +107,13 @@ fun LibraryComposable(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 private fun LazyItemScope.LibrarySwipeToDismiss(
-    playlist: Playlist,
+    libraryUiModel: LibraryUiModel,
     onPlaylistClick: (Int) -> Unit,
     onEditPlaylist: (Int) -> Unit,
     onDeletePlaylist: (Int) -> Unit
 ) {
     val context = LocalContext.current
-    val currentItem by rememberUpdatedState(playlist)
+    val currentItem by rememberUpdatedState(libraryUiModel)
     val dismissState = rememberDismissState(
         confirmValueChange = { dismissValue ->
             when (dismissValue) {
@@ -143,7 +142,7 @@ private fun LazyItemScope.LibrarySwipeToDismiss(
             SwipeBackground(dismissState)
         },
         dismissContent = {
-            PlaylistItemRow(playlist, onPlaylistClick)
+            PlaylistItemRow(libraryUiModel, onPlaylistClick)
         }
     )
 }
@@ -278,14 +277,14 @@ private fun SwipeBackground(dismissState: DismissState) {
 }
 
 @Composable
-private fun PlaylistItemRow(playlist: Playlist, onPlaylistClick: (Int) -> Unit) {
+private fun PlaylistItemRow(libraryUiModel: LibraryUiModel, onPlaylistClick: (Int) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer
             )
-            .clickable { onPlaylistClick(playlist.id) }
+            .clickable { onPlaylistClick(libraryUiModel.id) }
             .padding(vertical = 5.dp)
             .padding(horizontal = 5.dp)
     ) {
@@ -301,8 +300,11 @@ private fun PlaylistItemRow(playlist: Playlist, onPlaylistClick: (Int) -> Unit) 
                 .padding(bottom = 3.dp)
         )
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            Text(text = playlist.name, color = MaterialTheme.colorScheme.primary)
-            Text(text = "${playlist.tracks.size} songs", color = MaterialTheme.colorScheme.primary)
+            Text(text = libraryUiModel.name, color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = "${libraryUiModel.tracksSize} songs",
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

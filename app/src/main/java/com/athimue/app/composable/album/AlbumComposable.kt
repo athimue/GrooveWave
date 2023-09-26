@@ -44,7 +44,7 @@ fun AlbumComposable(
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center
             )
-            PrimaryColorText(text = "Artist : ${it.artist.name}")
+            PrimaryColorText(text = "Artist : ${it.artistName}")
             PrimaryColorText(text = "Release date : ${it.releaseDate}")
             PrimaryColorText(text = "Duration : ${it.duration}")
             PrimaryColorText(text = "Tracks : ${it.nbTracks}")
@@ -54,13 +54,13 @@ fun AlbumComposable(
             PrimaryColorText(text = "Available ? : ${it.available}")
             PrimaryColorText(text = "Genres :")
             BulletList(
-                items = it.genres.map { genre -> genre.name },
+                items = it.genreNames,
                 modifier = Modifier.padding(8.dp),
                 lineSpacing = 4.dp,
             )
             PrimaryColorText(text = "Tracks :")
             BulletList(
-                items = it.tracks.map { track -> track.title },
+                items = it.trackNames,
                 modifier = Modifier.padding(8.dp),
                 lineSpacing = 4.dp,
             )

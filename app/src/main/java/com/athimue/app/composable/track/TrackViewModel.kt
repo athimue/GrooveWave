@@ -19,7 +19,9 @@ class TrackViewModel @Inject constructor(
     fun loadTrack(trackId: Long) {
         viewModelScope.launch {
             getTrackInfoUseCase.invoke(trackId).collect {
-                it.getOrNull()?.let { track -> uiState.value = uiState.value.copy(track = track) }
+                it.getOrNull()?.let { track ->
+                    uiState.value = uiState.value.copy(track = track.toTrackUiModel())
+                }
             }
         }
     }

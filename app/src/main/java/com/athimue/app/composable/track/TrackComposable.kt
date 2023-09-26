@@ -56,7 +56,7 @@ fun TrackComposable(
                 ) {
                     Text(text = "Album", textAlign = TextAlign.Center)
                     Image(
-                        painter = rememberAsyncImagePainter(it.album.cover),
+                        painter = rememberAsyncImagePainter(it.albumCover),
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -65,8 +65,8 @@ fun TrackComposable(
                             .clip(RoundedCornerShape(10.dp))
                             .padding(bottom = 3.dp)
                     )
-                    Text(text = it.album.name)
-                    Text(text = it.album.id.toString())
+                    Text(text = it.albumTitle)
+                    Text(text = it.albumId)
                     Text(text = "Track position  : ${it.position}")
                 }
                 Column(
@@ -75,7 +75,7 @@ fun TrackComposable(
                 ) {
                     Text(text = "Artist", textAlign = TextAlign.Center)
                     Image(
-                        painter = rememberAsyncImagePainter(it.artist.cover),
+                        painter = rememberAsyncImagePainter(it.artistPicture),
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -84,8 +84,8 @@ fun TrackComposable(
                             .clip(RoundedCornerShape(10.dp))
                             .padding(bottom = 3.dp)
                     )
-                    Text(text = it.artist.name)
-                    Text(text = it.artist.id.toString())
+                    Text(text = it.artistName)
+                    Text(text = it.artistId)
                 }
             }
         } ?: LoaderItem(Modifier.fillMaxSize())

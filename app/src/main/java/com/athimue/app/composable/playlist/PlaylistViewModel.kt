@@ -39,7 +39,7 @@ class PlaylistViewModel @Inject constructor(
                         playlist = PlaylistUiModel(
                             playlist.id,
                             playlist.name,
-                            playlist.tracks
+                            playlist.tracks.map { it.toTrackUiModel() }
                         )
                     )
             }
