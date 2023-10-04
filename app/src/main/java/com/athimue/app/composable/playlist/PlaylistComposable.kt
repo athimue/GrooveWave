@@ -156,6 +156,7 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
                     onSwipeToDismiss(currentItem.id, playlistId)
                     true
                 }
+
                 else -> false
             }
         }
@@ -226,7 +227,7 @@ private fun DeleteSwipeBackground(dismissState: DismissState) {
             DismissValue.Default -> Color.White
             DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
             DismissValue.DismissedToStart -> MaterialTheme.colorScheme.secondary
-        }
+        }, label = "color animation"
     )
     Box(
         Modifier

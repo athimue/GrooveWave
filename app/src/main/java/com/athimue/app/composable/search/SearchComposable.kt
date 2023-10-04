@@ -89,23 +89,21 @@ fun SearchComposable(
         }
         if (isBottomSheetDisplayed) {
             ModalBottomSheet(
-                onDismissRequest = { isBottomSheetDisplayed = false },
-                sheetState = bottomSheetState
+                onDismissRequest = { isBottomSheetDisplayed = false }, sheetState = bottomSheetState
             ) {
-                Scaffold(
-                    floatingActionButtonPosition = FabPosition.Center,
-                    floatingActionButton = {
-                        Button(onClick = {
-                            Toast.makeText(context, "Track added to playlist !", Toast.LENGTH_SHORT)
-                                .show()
-                            viewModel.addTrackToPlaylist(playlistSelected, trackSelected)
-                            isBottomSheetDisplayed = false
-                        }) {
-                            Text(text = "Done")
-                        }
+                Scaffold(floatingActionButtonPosition = FabPosition.Center, floatingActionButton = {
+                    Button(onClick = {
+                        Toast.makeText(context, "Track added to playlist !", Toast.LENGTH_SHORT)
+                            .show()
+                        viewModel.addTrackToPlaylist(playlistSelected, trackSelected)
+                        isBottomSheetDisplayed = false
+                    }) {
+                        Text(text = "Done")
                     }
-                ) {
-                    Column {
+                }) {
+                    Column(
+                        modifier = Modifier.padding(it)
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -114,12 +112,9 @@ fun SearchComposable(
                                 )
                         ) {
                             Text(
-                                modifier = Modifier
-                                    .clickable {
-                                        isBottomSheetDisplayed = false
-                                    },
-                                color = MaterialTheme.colorScheme.primary,
-                                text = "Cancel"
+                                modifier = Modifier.clickable {
+                                    isBottomSheetDisplayed = false
+                                }, color = MaterialTheme.colorScheme.primary, text = "Cancel"
                             )
                             Text(
                                 modifier = Modifier
@@ -134,9 +129,7 @@ fun SearchComposable(
                         Divider()
                         LazyColumn {
                             items(items = uiState.playlists) {
-                                Row(
-                                    modifier = Modifier.clickable { playlistSelected = it.id }
-                                ) {
+                                Row(modifier = Modifier.clickable { playlistSelected = it.id }) {
                                     Image(
                                         painter = if (it.trackUiModels.isNotEmpty()) rememberAsyncImagePainter(
                                             it.trackUiModels[0].cover
@@ -161,11 +154,9 @@ fun SearchComposable(
                                         Text(text = it.name)
                                         Text(text = "${it.trackUiModels.size} songs")
                                     }
-                                    RadioButton(
-                                        modifier = Modifier.align(Alignment.CenterVertically),
+                                    RadioButton(modifier = Modifier.align(Alignment.CenterVertically),
                                         selected = (it.id == playlistSelected),
-                                        onClick = { playlistSelected = it.id }
-                                    )
+                                        onClick = { playlistSelected = it.id })
                                 }
                                 Divider()
                             }
@@ -212,9 +203,7 @@ fun SearchBar(query: TextFieldValue, onQueryChange: (TextFieldValue) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ColumnScope.SearchFilter(
-    filters: List<String>,
-    filterSelected: String,
-    onFilterChange: (String) -> Unit
+    filters: List<String>, filterSelected: String, onFilterChange: (String) -> Unit
 ) {
     LazyRow(modifier = Modifier.padding(top = 10.dp)) {
         items(filters) {
@@ -224,8 +213,7 @@ fun ColumnScope.SearchFilter(
                     leadingIcon = {
                         if (it == filterSelected) {
                             Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Check"
+                                imageVector = Icons.Filled.Check, contentDescription = "Check"
                             )
                         }
                     },
@@ -255,12 +243,10 @@ fun ColumnScope.SearchGrid(
 ) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(searchResults) { item ->
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 5.dp)
-                    .padding(horizontal = 5.dp)
-                    .clickable { onClick(item.id) }
-            ) {
+            Row(modifier = Modifier
+                .padding(vertical = 5.dp)
+                .padding(horizontal = 5.dp)
+                .clickable { onClick(item.id) }) {
                 Image(
                     painter = rememberAsyncImagePainter(item.picture),
                     contentDescription = "",
@@ -277,17 +263,13 @@ fun ColumnScope.SearchGrid(
                     verticalArrangement = Arrangement.SpaceAround
                 ) {
                     Text(
-                        text = item.title,
-                        color = MaterialTheme.colorScheme.secondary
+                        text = item.title, color = MaterialTheme.colorScheme.secondary
                     )
                     Text(
-                        text = item.subTitle,
-                        color = MaterialTheme.colorScheme.secondary
+                        text = item.subTitle, color = MaterialTheme.colorScheme.secondary
                     )
                 }
-                Button(
-                    modifier = Modifier.padding(5.dp),
-                    onClick = { onFavBtnClick(item.id) }) {
+                Button(modifier = Modifier.padding(5.dp), onClick = { onFavBtnClick(item.id) }) {
                     Image(
                         imageVector = Icons.Rounded.Favorite,
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondaryContainer),
@@ -295,10 +277,8 @@ fun ColumnScope.SearchGrid(
                     )
                 }
                 if (isPlaylistBtnDisplayed) {
-                    Button(
-                        modifier = Modifier.padding(5.dp),
-                        onClick = { onPlaylistBtnClick(item.id) }
-                    ) {
+                    Button(modifier = Modifier.padding(5.dp),
+                        onClick = { onPlaylistBtnClick(item.id) }) {
                         Image(
                             imageVector = Icons.Rounded.Menu,
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondaryContainer),

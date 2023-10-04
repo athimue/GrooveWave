@@ -49,54 +49,44 @@ fun LibraryComposable(
             ) {
                 Icon(Icons.Rounded.Add, "Add playlist")
             }
-        },
-        floatingActionButtonPosition = FabPosition.End
+        }, floatingActionButtonPosition = FabPosition.End
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(it)
         ) {
             TitleText(title = "Your library")
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(
-                    items = uiState.playlists,
-                    key = { item -> item.id }) {
-                    LibrarySwipeToDismiss(
-                        libraryUiModel = it,
+                items(items = uiState.playlists, key = { item -> item.id }) { libraryUiModel ->
+                    LibrarySwipeToDismiss(libraryUiModel = libraryUiModel,
                         onPlaylistClick = onPlaylistClick,
                         onEditPlaylist = onEditPlaylist,
-                        onDeletePlaylist = { playlistId -> viewModel.deletePlaylist(playlistId) }
-                    )
+                        onDeletePlaylist = { playlistId -> viewModel.deletePlaylist(playlistId) })
                 }
             }
             if (isBottomSheetDisplayed) {
                 ModalBottomSheet(
                     onDismissRequest = { isBottomSheetDisplayed = false },
                     sheetState = bottomSheetState
-                )
-                {
-                    PlaylistModal(
-                        displayModal = {
-                            isBottomSheetDisplayed = false
-                            openDialog = true
-                        },
-                        displayBottomSheet = { isBottomSheetDisplayed = true }
-                    )
+                ) {
+                    PlaylistModal(displayModal = {
+                        isBottomSheetDisplayed = false
+                        openDialog = true
+                    }, displayBottomSheet = { isBottomSheetDisplayed = true })
                 }
             }
             if (openDialog) {
                 val context = LocalContext.current
                 PlaylistDialog(
                     playlistName = playlistName,
-                    onCreatePlaylist = {
+                    onCreatePlaylist = { name ->
                         Toast.makeText(
-                            context,
-                            "Playlist added !",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                        viewModel.createPlaylist(it)
+                            context, "Playlist added !", Toast.LENGTH_SHORT
+                        ).show()
+                        viewModel.createPlaylist(name)
                     },
-                    updatePlaylistName = { playlistName = it },
+                    updatePlaylistName = { name -> playlistName = name },
                     openDialog = { openDialog = false },
                 )
             }
@@ -114,27 +104,25 @@ private fun LazyItemScope.LibrarySwipeToDismiss(
 ) {
     val context = LocalContext.current
     val currentItem by rememberUpdatedState(libraryUiModel)
-    val dismissState = rememberDismissState(
-        confirmValueChange = { dismissValue ->
-            when (dismissValue) {
-                DismissValue.DismissedToEnd -> {
-                    onEditPlaylist(currentItem.id)
-                    true
-                }
-                DismissValue.DismissedToStart -> {
-                    Toast.makeText(
-                        context, "Playlist deleted !", Toast.LENGTH_SHORT
-                    )
-                        .show()
-                    onDeletePlaylist(currentItem.id)
-                    true
-                }
-                else -> false
+    val dismissState = rememberDismissState(confirmValueChange = { dismissValue ->
+        when (dismissValue) {
+            DismissValue.DismissedToEnd -> {
+                onEditPlaylist(currentItem.id)
+                true
             }
+
+            DismissValue.DismissedToStart -> {
+                Toast.makeText(
+                    context, "Playlist deleted !", Toast.LENGTH_SHORT
+                ).show()
+                onDeletePlaylist(currentItem.id)
+                true
+            }
+
+            else -> false
         }
-    )
-    SwipeToDismiss(
-        state = dismissState,
+    })
+    SwipeToDismiss(state = dismissState,
         modifier = Modifier
             .padding(vertical = 1.dp)
             .animateItemPlacement(),
@@ -143,8 +131,7 @@ private fun LazyItemScope.LibrarySwipeToDismiss(
         },
         dismissContent = {
             PlaylistItemRow(libraryUiModel, onPlaylistClick)
-        }
-    )
+        })
 }
 
 @Composable
@@ -170,20 +157,17 @@ private fun PlaylistDialog(
                     text = "Give your playlist a name",
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
-                    value = playlistName,
+                TextField(value = playlistName,
                     onValueChange = { updatePlaylistName.invoke(it) },
                     label = { Text("Playlist name") },
-                    placeholder = { Text("My playlist...") }
-                )
+                    placeholder = { Text("My playlist...") })
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
                         openDialog.invoke()
                         onCreatePlaylist(playlistName)
                         updatePlaylistName.invoke("")
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    }, modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text("Create")
                 }
@@ -194,23 +178,19 @@ private fun PlaylistDialog(
 
 @Composable
 private fun PlaylistModal(
-    displayModal: () -> Unit,
-    displayBottomSheet: () -> Unit
+    displayModal: () -> Unit, displayBottomSheet: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         TitleText(title = "Playlist menu")
         Row(
             modifier = Modifier.padding(10.dp)
         ) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    displayBottomSheet.invoke()
-                    displayModal.invoke()
-                }) {
+            Button(modifier = Modifier.fillMaxWidth(), onClick = {
+                displayBottomSheet.invoke()
+                displayModal.invoke()
+            }) {
                 Icon(
-                    imageVector = Icons.Rounded.AddCircle,
-                    contentDescription = ""
+                    imageVector = Icons.Rounded.AddCircle, contentDescription = ""
                 )
                 Text(
                     text = "Create playlist",
@@ -224,12 +204,10 @@ private fun PlaylistModal(
                 .padding(bottom = 30.dp)
         ) {
             Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = displayBottomSheet
+                modifier = Modifier.fillMaxWidth(), onClick = displayBottomSheet
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Settings,
-                    contentDescription = ""
+                    imageVector = Icons.Rounded.Settings, contentDescription = ""
                 )
                 Text(
                     text = "Options",
@@ -250,7 +228,7 @@ private fun SwipeBackground(dismissState: DismissState) {
             DismissValue.Default -> Color.White
             DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
             DismissValue.DismissedToStart -> MaterialTheme.colorScheme.secondary
-        }
+        }, label = "color animation"
     )
     val alignment = when (direction) {
         DismissDirection.StartToEnd -> Alignment.CenterStart
@@ -278,16 +256,14 @@ private fun SwipeBackground(dismissState: DismissState) {
 
 @Composable
 private fun PlaylistItemRow(libraryUiModel: LibraryUiModel, onPlaylistClick: (Int) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.primaryContainer
-            )
-            .clickable { onPlaylistClick(libraryUiModel.id) }
-            .padding(vertical = 5.dp)
-            .padding(horizontal = 5.dp)
-    ) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .background(
+            color = MaterialTheme.colorScheme.primaryContainer
+        )
+        .clickable { onPlaylistClick(libraryUiModel.id) }
+        .padding(vertical = 5.dp)
+        .padding(horizontal = 5.dp)) {
         Image(
             painter = painterResource(
                 id = R.drawable.playlist_cover
