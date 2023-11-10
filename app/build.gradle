@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.devtools.ksp'
 }
 
 android {
@@ -60,8 +60,7 @@ dependencies {
     implementation "androidx.compose.compiler:compiler:$compose_compiler"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation "androidx.navigation:navigation-compose:$nav_version"
-    //implementation "androidx.compose.material:material:$compose_material"
-    implementation "androidx.compose.material3:material3:1.1.1"
+    implementation "androidx.compose.material3:material3:$compose_material3"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$compose_version"
     // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
     implementation "androidx.compose.foundation:foundation:$compose_version"
@@ -70,7 +69,7 @@ dependencies {
     // Hilt dependencies
     implementation "androidx.hilt:hilt-navigation-compose:$nav_compose_version"
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    ksp "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit2"
