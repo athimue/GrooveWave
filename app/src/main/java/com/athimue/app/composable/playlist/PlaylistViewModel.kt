@@ -7,8 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.athimue.domain.usecase.deletePlaylistTrack.DeletePlaylistTrackUseCase
 import com.athimue.domain.usecase.getPlaylistInfo.GetPlaylistInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,10 +23,7 @@ class PlaylistViewModel @Inject constructor(
 
     private val mediaPlayer = MediaPlayer().also {
         it.setAudioAttributes(
-            AudioAttributes
-                .Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build()
+            AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
         )
         it.setOnCompletionListener {
             uiState.value = uiState.value.copy(trackUrlPlayed = null)
@@ -32,22 +31,22 @@ class PlaylistViewModel @Inject constructor(
     }
 
     fun loadPlaylist(playlistId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getPlaylistInfoUseCase.invoke(playlistId).collect { playlist ->
-                uiState.value =
-                    uiState.value.copy(
+                withContext(Dispatchers.Main) {
+                    uiState.value = uiState.value.copy(
                         playlist = PlaylistUiModel(
                             playlist.id,
                             playlist.name,
-                            playlist.tracks.map { it.toTrackUiModel() }
-                        )
+                            playlist.tracks.map { it.toTrackUiModel() })
                     )
+                }
             }
         }
     }
 
     fun deletePlaylistTrack(trackId: Long, playlistId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deletePlaylistTrackUseCase.invoke(playlistId, trackId)
         }
     }
