@@ -9,8 +9,10 @@ import com.athimue.domain.usecase.getPopularAlbums.GetPopularAlbumsUseCase
 import com.athimue.domain.usecase.getPopularArtists.GetPopularArtistsUseCase
 import com.athimue.domain.usecase.getPopularTracks.GetPopularTracksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,23 +25,28 @@ class HomeViewModel @Inject constructor(
     var uiState = MutableStateFlow(HomeUiState())
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getPopularTracksUseCase.invoke().collect {
-                uiState.value =
-                    uiState.value.copy(tracks = it.getOrElse { emptyList() }
+                withContext(Dispatchers.Main) {
+                    uiState.value = uiState.value.copy(tracks = it.getOrElse { emptyList() }
                         .map { track -> track.toLazyRowItemModel() })
+                }
             }
             getPopularAlbumsUseCase.invoke().collect {
-                uiState.value =
-                    uiState.value.copy(albums = it.getOrElse { emptyList() }.map { album ->
-                        album.toLazyRowItemModel()
-                    })
+                withContext(Dispatchers.Main) {
+                    uiState.value =
+                        uiState.value.copy(albums = it.getOrElse { emptyList() }.map { album ->
+                            album.toLazyRowItemModel()
+                        })
+                }
             }
             getPopularArtistsUseCase.invoke().collect {
-                uiState.value =
-                    uiState.value.copy(artists = it.getOrElse { emptyList() }.map { artist ->
-                        artist.toLazyRowItemModel()
-                    })
+                withContext(Dispatchers.Main) {
+                    uiState.value =
+                        uiState.value.copy(artists = it.getOrElse { emptyList() }.map { artist ->
+                            artist.toLazyRowItemModel()
+                        })
+                }
             }
         }
     }
@@ -47,8 +54,7 @@ class HomeViewModel @Inject constructor(
     private fun Track.toLazyRowItemModel(): LazyRowItemModel =
         LazyRowItemModel(id, titleShort, cover)
 
-    private fun Album.toLazyRowItemModel(): LazyRowItemModel =
-        LazyRowItemModel(id, name, cover)
+    private fun Album.toLazyRowItemModel(): LazyRowItemModel = LazyRowItemModel(id, name, cover)
 
     private fun Artist.toLazyRowItemModel(): LazyRowItemModel =
         LazyRowItemModel(id, name, cover ?: "")

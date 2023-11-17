@@ -13,8 +13,10 @@ import com.athimue.domain.usecase.getFavoriteAlbums.GetFavoriteAlbumsUseCase
 import com.athimue.domain.usecase.getFavoriteArtists.GetFavoriteArtistsUseCase
 import com.athimue.domain.usecase.getFavoriteTracks.GetFavoriteTracksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,28 +32,34 @@ internal class FavoritesViewModel @Inject constructor(
     var uiState = MutableStateFlow(FavoritesUiState())
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getFavoriteArtistsUseCase.invoke().collect {
-                uiState.value =
-                    uiState.value.copy(favoriteArtists = it.map { artist -> artist.toSearchResultModel() })
+                withContext(Dispatchers.Main) {
+                    uiState.value =
+                        uiState.value.copy(favoriteArtists = it.map { artist -> artist.toSearchResultModel() })
+                }
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getFavoriteTracksUseCase.invoke().collect {
-                uiState.value =
-                    uiState.value.copy(favoriteTracks = it.map { track -> track.toSearchResultModel() })
+                withContext(Dispatchers.Main) {
+                    uiState.value =
+                        uiState.value.copy(favoriteTracks = it.map { track -> track.toSearchResultModel() })
+                }
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getFavoriteAlbumsUseCase.invoke().collect {
-                uiState.value =
-                    uiState.value.copy(favoriteAlbums = it.map { album -> album.toSearchResultModel() })
+                withContext(Dispatchers.Main) {
+                    uiState.value =
+                        uiState.value.copy(favoriteAlbums = it.map { album -> album.toSearchResultModel() })
+                }
             }
         }
     }
 
     fun removeFavorite(filter: String, id: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (filter) {
                 "Tracks" -> deleteFavoriteTrackUseCase.invoke(id)
                 "Artists" -> deleteFavoriteArtistUseCase.invoke(id)

@@ -17,11 +17,13 @@ import com.athimue.domain.usecase.getArtistSearch.GetArtistSearchUseCase
 import com.athimue.domain.usecase.getPlaylists.GetPlaylistsUseCase
 import com.athimue.domain.usecase.getTrackSearch.GetTrackSearchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,21 +38,20 @@ class SearchViewModel @Inject constructor(
     private val addFavoriteAlbumUseCase: AddFavoriteAlbumUseCase,
 ) : ViewModel() {
 
-    var uiState: MutableStateFlow<SearchUiState> =
-        MutableStateFlow(SearchUiState())
+    var uiState: MutableStateFlow<SearchUiState> = MutableStateFlow(SearchUiState())
 
     private var searchJob: Job? = null
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getPlaylistsUseCase.invoke().collect {
-                uiState.value = uiState.value.copy(playlists = it.map { playlist ->
-                    PlaylistUiModel(
-                        id = playlist.id,
-                        name = playlist.name,
-                        trackUiModels = playlist.tracks.map { track -> track.toTrackUiModel() }
-                    )
-                })
+                withContext(Dispatchers.Main) {
+                    uiState.value = uiState.value.copy(playlists = it.map { playlist ->
+                        PlaylistUiModel(id = playlist.id,
+                            name = playlist.name,
+                            trackUiModels = playlist.tracks.map { track -> track.toTrackUiModel() })
+                    })
+                }
             }
         }
     }
@@ -58,7 +59,7 @@ class SearchViewModel @Inject constructor(
     fun searchRequested(filter: String, query: String) {
         uiState.value = uiState.value.copy(isLoading = true)
         searchJob?.cancel()
-        searchJob = viewModelScope.launch {
+        searchJob = viewModelScope.launch(Dispatchers.IO) {
             delay(500)
             if (query.isNotBlank()) {
                 when (filter) {
@@ -67,18 +68,23 @@ class SearchViewModel @Inject constructor(
                         mapper = { it.toSearchResultModel() },
                         query = query
                     )
+
                     "Album" -> searchByQuery(
                         getAlbumSearchUseCase, { it.toSearchResultModel() }, query
                     )
+
                     "Artist" -> searchByQuery(
                         getArtistSearchUseCase, mapper = { it.toSearchResultModel() }, query
                     )
+
                     "Playlist" -> searchByQuery(
                         getTrackSearchUseCase, mapper = { it.toSearchResultModel() }, query
                     )
+
                     "Podcast" -> searchByQuery(
                         getTrackSearchUseCase, mapper = { it.toSearchResultModel() }, query
                     )
+
                     "Radio" -> searchByQuery(
                         getTrackSearchUseCase, mapper = { it.toSearchResultModel() }, query
                     )
@@ -88,16 +94,15 @@ class SearchViewModel @Inject constructor(
     }
 
     fun addTrackToPlaylist(playlistId: Int, trackId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             addPlaylistTrackUseCase.invoke(
-                firstInput = playlistId,
-                secondInput = trackId
+                firstInput = playlistId, secondInput = trackId
             )
         }
     }
 
     fun addFavorite(filterSelected: String, id: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (filterSelected) {
                 "Track" -> addFavoriteTrackUseCase.invoke(id)
                 "Album" -> addFavoriteAlbumUseCase.invoke(id)
@@ -112,8 +117,7 @@ class SearchViewModel @Inject constructor(
         query: String
     ) {
         getSearchUseCase.invoke(query).collect {
-            uiState.value = uiState.value.copy(
-                isLoading = false,
+            uiState.value = uiState.value.copy(isLoading = false,
                 searchResult = it.getOrElse { emptyList() }.map { result -> mapper(result) })
         }
     }
