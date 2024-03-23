@@ -5,7 +5,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
@@ -14,7 +20,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -74,7 +89,7 @@ fun PlaylistComposable(
                             it.trackUiModels.map { it.duration }.reduce { acc, dur -> acc + dur }
                         } sec"
                     } else "0 sec")
-                Divider(modifier = Modifier.padding(start = 10.dp, top = 5.dp))
+                HorizontalDivider(modifier = Modifier.padding(start = 10.dp, top = 5.dp))
                 if (it.trackUiModels.isNotEmpty()) {
                     PlaylistTracksLazyColumn(
                         trackUiModels = it.trackUiModels,
@@ -143,10 +158,10 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
 ) {
     val context = LocalContext.current
     val currentItem by rememberUpdatedState(trackUiModel)
-    val dismissState = rememberDismissState(
+    val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
             when (dismissValue) {
-                DismissValue.DismissedToStart -> {
+                SwipeToDismissBoxValue.EndToStart -> {
                     Toast.makeText(
                         context,
                         "Track deleted !",
@@ -161,16 +176,16 @@ private fun LazyItemScope.PlaylistSwipeToDismissItem(
             }
         }
     )
-    SwipeToDismiss(
+    SwipeToDismissBox(
         state = dismissState,
         modifier = modifier
             .padding(vertical = 1.dp)
             .animateItemPlacement(),
-        background = {
+        backgroundContent = {
             DeleteSwipeBackground(dismissState)
         },
-        directions = setOf(DismissDirection.EndToStart),
-        dismissContent = {
+        enableDismissFromStartToEnd = false,
+        content = {
             TrackRowItem(trackUiModel, trackPlaying, onPlayClick)
         }
     )
@@ -216,17 +231,17 @@ private fun TrackRowItem(
             )
         }
     }
-    Divider()
+    HorizontalDivider()
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun DeleteSwipeBackground(dismissState: DismissState) {
+private fun DeleteSwipeBackground(dismissState: SwipeToDismissBoxState) {
     val color by animateColorAsState(
         when (dismissState.targetValue) {
-            DismissValue.Default -> Color.White
-            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
-            DismissValue.DismissedToStart -> MaterialTheme.colorScheme.secondary
+            SwipeToDismissBoxValue.Settled -> Color.White
+            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.secondary
         }, label = "color animation"
     )
     Box(
@@ -239,7 +254,7 @@ private fun DeleteSwipeBackground(dismissState: DismissState) {
         Icon(
             imageVector = Icons.Rounded.Delete,
             contentDescription = "Delete Icon",
-            modifier = Modifier.scale(if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f)
+            modifier = Modifier.scale(if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.75f else 1f)
         )
     }
 }

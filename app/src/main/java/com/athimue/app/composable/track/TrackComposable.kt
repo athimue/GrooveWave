@@ -1,9 +1,15 @@
 package com.athimue.app.composable.track
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,7 +54,7 @@ fun TrackComposable(
             PrimaryColorText(text = "Duration : ${it.duration / 60} min ${it.duration % 60}")
             PrimaryColorText(text = "Leaderboard : ${it.rank}")
             PrimaryColorText(text = "Explicit ? : ${it.explicitLyrics}")
-            Divider(modifier = Modifier.padding(vertical = 5.dp))
+            HorizontalDivider(modifier = Modifier.height(height = 5.dp))
             Row {
                 Column(
                     modifier = Modifier.weight(1f),

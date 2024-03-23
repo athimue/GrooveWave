@@ -2,7 +2,11 @@ package com.athimue.app.composable.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -92,7 +96,7 @@ fun HomeComposableContent(
 }
 
 @Composable
-fun ColumnScope.HomeLazyRow(
+fun HomeLazyRow(
     titleId: Int,
     errorTitle: Int,
     items: List<LazyRowItemModel>?,

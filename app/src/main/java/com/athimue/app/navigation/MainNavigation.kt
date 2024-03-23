@@ -1,14 +1,19 @@
 package com.athimue.app.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -27,14 +32,14 @@ import com.athimue.app.composable.search.SearchComposable
 import com.athimue.app.composable.track.TrackComposable
 
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object Search : Screen("search")
-    object Library : Screen("library")
-    object Favorites : Screen("favorites")
-    object Playlist : Screen("playlist/{id}")
-    object Track : Screen("track/{id}")
-    object Album : Screen("album/{id}")
-    object Artist : Screen("artist/{id}")
+    data object Home : Screen("home")
+    data object Search : Screen("search")
+    data object Library : Screen("library")
+    data object Favorites : Screen("favorites")
+    data object Playlist : Screen("playlist/{id}")
+    data object Track : Screen("track/{id}")
+    data object Album : Screen("album/{id}")
+    data object Artist : Screen("artist/{id}")
 }
 
 @Composable
@@ -89,7 +94,6 @@ fun MainNavigation() {
             composable(Screen.Search.route) {
                 SearchComposable(
                     onClick = { filter, id ->
-                        Log.d("COUCOU", "$filter, $id")
                         when (filter) {
                             "Track" -> navController.navigate(
                                 Screen.Track.route.replace(
@@ -97,12 +101,14 @@ fun MainNavigation() {
                                     newValue = id.toString()
                                 )
                             )
+
                             "Album" -> navController.navigate(
                                 Screen.Album.route.replace(
                                     oldValue = "{id}",
                                     newValue = id.toString()
                                 )
                             )
+
                             "Artist" -> navController.navigate(
                                 Screen.Artist.route.replace(
                                     oldValue = "{id}",
@@ -208,7 +214,7 @@ fun MenuBottomBar(
         NavigationItem(
             isSelected = currentRoute == Screen.Library.route,
             text = "Library",
-            imageVector = Icons.Rounded.List,
+            imageVector = Icons.AutoMirrored.Rounded.List,
             onClick = onLibraryClick
         )
         NavigationItem(

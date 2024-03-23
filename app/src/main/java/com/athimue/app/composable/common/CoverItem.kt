@@ -18,7 +18,7 @@ fun ColumnScope.CoverItem(
 ) {
     Image(
         painter = painter,
-        contentDescription = "",
+        contentDescription = null,
         alignment = Alignment.Center,
         modifier = Modifier
             .size(200.dp)

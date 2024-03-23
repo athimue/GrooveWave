@@ -3,18 +3,46 @@ package com.athimue.app.composable.search
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,8 +75,8 @@ fun SearchComposable(
     var query by remember { mutableStateOf(TextFieldValue("")) }
     var isBottomSheetDisplayed by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(isBottomSheetDisplayed)
-    var playlistSelected by remember { mutableStateOf(-1) }
-    var trackSelected by remember { mutableStateOf(-1L) }
+    var playlistSelected by remember { mutableIntStateOf(-1) }
+    var trackSelected by remember { mutableLongStateOf(-1) }
     var filterSelected by remember { mutableStateOf("Track") }
 
     Column(
@@ -84,8 +112,7 @@ fun SearchComposable(
                     Toast.makeText(context, "Song added to Favorites", Toast.LENGTH_SHORT).show()
                     viewModel.addFavorite(filterSelected, it)
                 },
-                onClick = { onClick(filterSelected, it) },
-            )
+            ) { onClick(filterSelected, it) }
         }
         if (isBottomSheetDisplayed) {
             ModalBottomSheet(
@@ -126,7 +153,7 @@ fun SearchComposable(
                                 textAlign = TextAlign.Center,
                             )
                         }
-                        Divider()
+                        HorizontalDivider()
                         LazyColumn {
                             items(items = uiState.playlists) {
                                 Row(modifier = Modifier.clickable { playlistSelected = it.id }) {
@@ -158,7 +185,7 @@ fun SearchComposable(
                                         selected = (it.id == playlistSelected),
                                         onClick = { playlistSelected = it.id })
                                 }
-                                Divider()
+                                HorizontalDivider()
                             }
                         }
                     }
@@ -200,9 +227,8 @@ fun SearchBar(query: TextFieldValue, onQueryChange: (TextFieldValue) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ColumnScope.SearchFilter(
+fun SearchFilter(
     filters: List<String>, filterSelected: String, onFilterChange: (String) -> Unit
 ) {
     LazyRow(modifier = Modifier.padding(top = 10.dp)) {
@@ -225,6 +251,8 @@ fun ColumnScope.SearchFilter(
                         selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondary,
                     ),
                     border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = true,
                         borderColor = MaterialTheme.colorScheme.secondary,
                     ),
                     onClick = { onFilterChange(it) })
@@ -234,7 +262,7 @@ fun ColumnScope.SearchFilter(
 }
 
 @Composable
-fun ColumnScope.SearchGrid(
+fun SearchGrid(
     searchResults: List<SearchResultModel>,
     isPlaylistBtnDisplayed: Boolean,
     onPlaylistBtnClick: (Long) -> Unit,
@@ -277,7 +305,8 @@ fun ColumnScope.SearchGrid(
                     )
                 }
                 if (isPlaylistBtnDisplayed) {
-                    Button(modifier = Modifier.padding(5.dp),
+                    Button(
+                        modifier = Modifier.padding(5.dp),
                         onClick = { onPlaylistBtnClick(item.id) }) {
                         Image(
                             imageVector = Icons.Rounded.Menu,
@@ -287,7 +316,7 @@ fun ColumnScope.SearchGrid(
                     }
                 }
             }
-            Divider()
+            HorizontalDivider()
         }
     }
 }

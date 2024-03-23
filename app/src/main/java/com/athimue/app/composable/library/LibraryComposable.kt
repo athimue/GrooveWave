@@ -6,16 +6,52 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +60,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.athimue.app.R
 import com.athimue.app.composable.common.TitleText
@@ -104,14 +141,14 @@ private fun LazyItemScope.LibrarySwipeToDismiss(
 ) {
     val context = LocalContext.current
     val currentItem by rememberUpdatedState(libraryUiModel)
-    val dismissState = rememberDismissState(confirmValueChange = { dismissValue ->
+    val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = { dismissValue ->
         when (dismissValue) {
-            DismissValue.DismissedToEnd -> {
+            SwipeToDismissBoxValue.StartToEnd -> {
                 onEditPlaylist(currentItem.id)
                 true
             }
 
-            DismissValue.DismissedToStart -> {
+            SwipeToDismissBoxValue.EndToStart -> {
                 Toast.makeText(
                     context, "Playlist deleted !", Toast.LENGTH_SHORT
                 ).show()
@@ -122,27 +159,27 @@ private fun LazyItemScope.LibrarySwipeToDismiss(
             else -> false
         }
     })
-    SwipeToDismiss(state = dismissState,
+    SwipeToDismissBox(
+        state = dismissState,
         modifier = Modifier
             .padding(vertical = 1.dp)
             .animateItemPlacement(),
-        background = {
+        backgroundContent = {
             SwipeBackground(dismissState)
         },
-        dismissContent = {
+        content = {
             PlaylistItemRow(libraryUiModel, onPlaylistClick)
         })
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun PlaylistDialog(
     playlistName: String,
     onCreatePlaylist: (String) -> Unit,
     updatePlaylistName: (String) -> Unit,
     openDialog: () -> Unit,
 ) {
-    AlertDialog(
+    Dialog(
         onDismissRequest = openDialog
     ) {
         Surface(
@@ -220,37 +257,41 @@ private fun PlaylistModal(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun SwipeBackground(dismissState: DismissState) {
-    val direction = dismissState.dismissDirection ?: return
+private fun SwipeBackground(dismissState: SwipeToDismissBoxState) {
+    val direction = dismissState.dismissDirection
 
     val color by animateColorAsState(
         when (dismissState.targetValue) {
-            DismissValue.Default -> Color.White
-            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
-            DismissValue.DismissedToStart -> MaterialTheme.colorScheme.secondary
+            SwipeToDismissBoxValue.Settled -> Color.White
+            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.secondary
         }, label = "color animation"
     )
     val alignment = when (direction) {
-        DismissDirection.StartToEnd -> Alignment.CenterStart
-        DismissDirection.EndToStart -> Alignment.CenterEnd
+        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+        else -> Alignment.Center
     }
     val icon = when (direction) {
-        DismissDirection.StartToEnd -> Icons.Rounded.Edit
-        DismissDirection.EndToStart -> Icons.Rounded.Delete
+        SwipeToDismissBoxValue.StartToEnd -> Icons.Rounded.Edit
+        SwipeToDismissBoxValue.EndToStart -> Icons.Rounded.Delete
+        else -> null
     }
 
     Box(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(color)
             .padding(horizontal = 20.dp),
         contentAlignment = alignment
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = "Delete Icon",
-            modifier = Modifier.scale(if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f)
-        )
+        icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = "Delete Icon",
+                modifier = Modifier.scale(if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.75f else 1f)
+            )
+        }
     }
 }
 

@@ -7,4 +7,4 @@ import dagger.hilt.android.HiltAndroidApp
  * Groove wave to use Hilt.
  */
 @HiltAndroidApp
-class GrooveWaveApplication: Application()
+class GrooveWaveApplication : Application()

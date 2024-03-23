@@ -11,9 +11,13 @@ import androidx.compose.ui.Modifier
 fun LoaderItem(
     modifier: Modifier
 ) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
         CircularProgressIndicator(
-            modifier = Modifier, color = MaterialTheme.colorScheme.primary
+            modifier = Modifier,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
